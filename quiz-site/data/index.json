@@ -1,1 +1,4 @@
-[{"name": "Sample Quiz", "file": "sample.json"}]
+[
+  {"name": "Sample Quiz", "file": "sample.json"}
+  {"name": "CTP 2nd Quarter", "file": "CTP Quiz.json"}
+]
