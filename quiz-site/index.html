@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Test - Auto Answer Quiz</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #0b0f1c; color: #f0f0f0; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column; }
+        .game-panel, .edit-panel, .score-panel, .review-panel { background: #1f2639; border-radius: 32px; padding: 30px 25px; width: 95%; max-width: 750px; box-shadow: 0 25px 40px -10px #00000080; backdrop-filter: blur(2px); border: 1px solid #3e4a5f; margin: 10px auto; position: relative; }
+        h1, h2 { margin-top: 0; font-weight: 400; letter-spacing: -0.5px; border-left: 5px solid #5f9ea0; padding-left: 20px; }
+        h1 { font-size: 2.2rem; } h2 { font-size: 1.8rem; }
+        .question-display { background: #2b3348; padding: 25px 20px; border-radius: 40px; font-size: 1.6rem; font-weight: 600; margin: 20px 0; word-break: break-word; box-shadow: inset 0 0 0 1px #4b5670; text-align: center; }
+        .question-display img { max-width: 100%; max-height: 350px; border-radius: 20px; margin: 10px 0; border: 2px solid #5f9ea0; }
+        .options-container { background: #2b3348; border-radius: 30px; padding: 20px; margin: 15px 0; border: 2px solid #5f9ea0; max-height: 400px; overflow-y: auto; }
+        .option-item { background: #3c4b6a; padding: 15px 20px; margin: 10px 0; border-radius: 40px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 15px; text-align: left; }
+        .option-item:active { transform: scale(0.98); }
+        .option-item.selected { background: #5f9ea0; border-left: 5px solid #ffb86b; }
+        .option-item.correct-highlight { background: #2e8b57 !important; border-left: 5px solid #a0ffa0; }
+        .option-item.wrong-highlight { background: #ff6b6b !important; border-left: 5px solid #ff0000; }
+        .option-prefix { font-weight: bold; color: #ffb86b; font-size: 1rem; min-width: 70px; text-align: left; }
+        .option-text { flex: 1; text-align: left; }
+        .option-key-hint { color: #5f9ea0; font-size: 0.8rem; margin-left: 5px; opacity: 0.6; font-weight: bold; }
+        input[type="text"] { width: 100%; }
+        input, textarea, button { background: #2b3348; border: 2px solid #414e6b; color: white; font-size: 1.2rem; padding: 15px 20px; border-radius: 60px; width: 100%; margin: 8px 0; transition: 0.2s; outline: none; }
+        input:focus { border-color: #5f9ea0; box-shadow: 0 0 10px rgba(95, 158, 160, 0.3); }
+        textarea { border-radius: 30px; resize: vertical; min-height: 400px; font-family: 'Fira Code', monospace; line-height: 1.6; background: #1a1f2e; border-color: #3d4b66; font-size: 0.9rem; }
+        button { background: #3c4b6a; border: none; font-weight: 600; cursor: pointer; width: auto; min-width: 200px; padding: 15px 30px; margin: 10px 10px 10px 0; border-radius: 40px; box-shadow: 0 8px 0 #1f2537; transition: all 0.2s; }
+        button:active { transform: translateY(2px); box-shadow: 0 4px 0 #1f2537; }
+        button.small { background: #2f3b52; font-size: 1rem; padding: 12px 20px; min-width: 120px; }
+        button.save-as-btn { background: #2e8b57; box-shadow: 0 8px 0 #1e5a3a; }
+        button.auto-save-btn { background: #ffb86b; color: #0b0f1c; box-shadow: 0 8px 0 #b86f2c; }
+        #submitBtn.correct-feedback { background: #2e8b57 !important; box-shadow: 0 8px 0 #1e5a3a; }
+        #submitBtn.wrong-feedback { background: #ff6b6b !important; box-shadow: 0 8px 0 #b84545; }
+        #submitBtn.typo-feedback { background: #ffb86b !important; color: #0b0f1c !important; box-shadow: 0 8px 0 #b86f2c; }
+        .matic-button { background: #ffb86b; color: #0b0f1c; font-size: 1.4rem; font-weight: bold; padding: 18px 25px; min-width: 250px; box-shadow: 0 6px 0 #b86f2c; margin: 15px auto; border-radius: 60px; display: block; width: 100%; text-align: center; }
+        .matic-button.active { background: #2e8b57; color: white; box-shadow: 0 6px 0 #1e5a3a; }
+        .tts-button { background: #6c5b7b; color: white; font-size: 1.4rem; font-weight: bold; padding: 18px 25px; min-width: 250px; box-shadow: 0 6px 0 #3d2e4a; margin: 10px auto; border-radius: 60px; display: block; width: 100%; text-align: center; }
+        .tts-button.active { background: #5f9ea0; color: white; box-shadow: 0 6px 0 #3d6b6d; }
+        .tts-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 6px 0 #3d2e4a; }
+        .hidden { display: none !important; }
+        .flex-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .review-item { background: #252e40; padding: 20px; border-radius: 30px; margin-bottom: 15px; border-left: 10px solid; text-align: left; }
+        .review-item.correct { border-left-color: #2ecc71; }
+        .review-item.incorrect { border-left-color: #e74c3c; }
+        .score-number { font-size: 3.5rem; font-weight: 800; background: linear-gradient(145deg, #b3f0ff, #6c9eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .edit-icon { position: fixed; top: 20px; right: 25px; background: #242c3f; border: none; font-size: 2rem; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; box-shadow: 0 5px 15px black; z-index: 999; display: flex; align-items: center; justify-content: center; }
+        .progress-indicator { margin-top: 15px; color: #8a9bc0; font-size: 1rem; }
+        .timer-display { background: #2b3348; color: #5f9ea0; padding: 10px 20px; border-radius: 50px; display: inline-block; margin-bottom: 15px; font-size: 1.3rem; font-weight: bold; border: 1px solid #5f9ea0; }
+        .timer-display.timer-warning { color: #ff6b6b !important; border-color: #ff6b6b !important; animation: pulse 0.5s infinite; }
+        .stats-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .test-indicator { background: #3c4b6a; padding: 8px 20px; border-radius: 30px; font-size: 1rem; color: #ffffff; margin-top: 10px; display: inline-block; font-weight: bold; border-left: 5px solid #5f9ea0; }
+        .test-progress { background: #2b3348; padding: 5px 15px; border-radius: 30px; font-size: 0.9rem; color: #5f9ea0; margin-left: 10px; display: inline-block; }
+        .test-mode-badge { background: #5f9ea0; color: #0b0f1c; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; display: inline-block; }
+        .error-message { color: #ff6b6b; font-size: 1rem; margin-top: 5px; display: none; }
+        .error-message.visible { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .save-notification { background: #2e8b57; color: white; padding: 10px 20px; border-radius: 30px; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; animation: slideUp 0.3s, fadeOut 0.3s 2.7s; opacity: 0; pointer-events: none; }
+        @keyframes slideUp { from { bottom: 0; opacity: 0; } to { bottom: 20px; opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .removed-info { background: #4a2c2c; border-left: 5px solid #ff6b6b; padding: 12px; margin: 10px 0; border-radius: 20px; font-size: 0.95rem; color: #ff9999; }
+        .dropdown-container { margin-bottom: 20px; position: relative; }
+        .dropdown-header { background: #3c4b6a; padding: 12px 20px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-left: 5px solid #5f9ea0; }
+        .dropdown-header .arrow { font-size: 1.2rem; transition: transform 0.3s; }
+        .dropdown-header.open .arrow { transform: rotate(180deg); }
+        .dropdown-content { background: #2b3348; border-radius: 20px; padding: 20px; margin-top: 10px; border: 1px solid #5f9ea0; display: none; }
+        .dropdown-content.show { display: block; }
+        .instruction-section { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #414e6b; }
+        .instruction-section:last-child { border-bottom: none; }
+        .instruction-title { color: #5f9ea0; font-weight: bold; margin-bottom: 8px; font-size: 1.1rem; }
+        .instruction-item { margin: 8px 0; padding-left: 15px; color: #a9c9ff; }
+        .auto-save-status { font-size: 0.8rem; color: #8a9bc0; margin-left: 10px; }
+        .latex-preview { background: #2b3348; border-radius: 20px; padding: 15px; margin: 15px 0 10px 0; border-left: 5px solid #5f9ea0; }
+        .latex-preview-title { font-size: 0.9rem; color: #5f9ea0; margin-bottom: 10px; font-weight: bold; }
+        .preview-content { font-family: 'Segoe UI', Roboto, system-ui, sans-serif; line-height: 1.6; }
+        .preview-line { margin: 8px 0; padding: 5px; border-radius: 12px; background: #1a1f2e; word-break: break-word; }
+        .matic-status { text-align: center; padding: 12px; background: #2b3348; border-radius: 30px; margin: 10px 0; color: #ffb86b; font-weight: bold; animation: pulse 1s infinite; }
+        .tts-status { text-align: center; padding: 12px; background: #6c5b7b; border-radius: 30px; margin: 10px 0; color: white; font-weight: bold; }
+        .timer-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; background: #2b3348; padding: 10px; border-radius: 60px; }
+        .timer-control label { font-size: 1rem; color: #ffb86b; }
+        .timer-control input { width: 70px; padding: 8px; margin: 0; text-align: center; font-size: 1rem; }
+        .feedback-box { background: #2e8b57; color: white; padding: 12px 20px; border-radius: 30px; margin: 10px 0; text-align: center; font-size: 1.1rem; font-weight: bold; border-left: 5px solid #a0ffa0; }
+        .feedback-box.wrong { background: #ff6b6b; border-left: 5px solid #ff0000; }
+        .feedback-box.typo { background: #ffb86b; color: #0b0f1c; border-left: 5px solid #ffa500; }
+        .feedback-box .highlight-gold { color: #ffd700; font-weight: bold; background: rgba(255, 215, 0, 0.2); padding: 2px 4px; border-radius: 4px; }
+        .continue-btn { background: #5f9ea0; color: #0b0f1c; min-width: 150px; margin: 5px auto; padding: 10px 20px; font-size: 1rem; }
+        .keyboard-hint { color: #5f9ea0; font-size: 0.85rem; text-align: center; margin-top: 5px; opacity: 0.7; }
+        .tts-pause-input { width: 70px; padding: 8px; margin: 0; text-align: center; font-size: 1rem; }
+        .speech-rate-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; background: #2b3348; padding: 10px; border-radius: 60px; }
+        .speech-rate-control label { font-size: 1rem; color: #ffb86b; }
+        .speech-rate-control input[type="range"] { width: 150px; margin: 0; padding: 0; accent-color: #5f9ea0; background: transparent; }
+        .speech-rate-control span { color: #ffb86b; font-weight: bold; min-width: 40px; }
+        .tts-controls { margin: 10px 0; padding: 15px; background: #2b3348; border-radius: 30px; border-left: 5px solid #6c5b7b; }
+        .tts-controls.disabled { opacity: 0.4; pointer-events: none; }
+        .voice-lang-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; background: #2b3348; padding: 10px; border-radius: 60px; }
+        .voice-lang-control label { font-size: 1rem; color: #ffb86b; }
+        .voice-lang-toggle { display: inline-flex; border-radius: 40px; overflow: hidden; border: 2px solid #414e6b; }
+        .voice-lang-toggle button { min-width: 70px; width: auto; padding: 8px 18px; margin: 0; border-radius: 0; font-size: 1rem; font-weight: 700; box-shadow: none; background: #2b3348; color: #8a9bc0; }
+        .voice-lang-toggle button.active { background: #5f9ea0; color: white; }
+        .voice-lang-toggle button:active { transform: none; box-shadow: none; }
+        .voice-warning { font-size: 0.85rem; color: #ffb86b; text-align: center; margin-top: 6px; display: none; }
+        .voice-warning.visible { display: block; }
+    .subject-select{position:fixed;top:20px;left:20px;z-index:999;width:auto;max-width:55vw;padding:10px 16px;margin:0;font-size:1rem;border-radius:40px;background:#242c3f;color:#fff;border:2px solid #414e6b;}
+    </style>
+</head>
+<body>
+    <button class="edit-icon" onclick="toggleEditor()">⚙️</button>
+    <select id="subjectSelect" class="subject-select"></select>
+
+    <audio id="correctSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+    <audio id="incorrectSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+    <div id="gameContainer" class="game-panel">
+        <h1>Test</h1>
+        <div class="stats-container">
+            <div id="timerDisplay" class="timer-display">⏱️ 0:00</div>
+            <div id="progressDisplay" class="progress-indicator">📊 0/0 answered</div>
+        </div>
+        <div class="question-display" id="questionText">Loading...</div>
+        <div id="optionsContainer" class="options-container hidden"></div>
+        <div>
+            <span id="testIndicator" class="test-indicator"></span>
+            <span id="testProgress" class="test-progress"></span>
+        </div>
+        <div class="flex-row">
+            <input type="text" id="answerInput" placeholder="Type your answer" autocomplete="off" style="flex: 1;">
+        </div>
+        <div id="emptyAnswerError" class="error-message">⚠️ Please enter an answer before submitting</div>
+        <div class="flex-row">
+            <button id="submitBtn">submit</button>
+        </div>
+        <div id="feedbackBox" class="feedback-box hidden"></div>
+        <div id="typoContinueContainer" class="hidden" style="text-align: center; margin: 5px 0;">
+            <button id="typoContinueBtn" class="continue-btn">▶ Continue</button>
+            <span style="color: #8a9bc0; font-size: 0.8rem; margin-left: 10px;">or press Enter</span>
+        </div>
+        <div id="maticStatus" class="hidden"></div>
+        <div id="ttsStatus" class="tts-status hidden"></div>
+        <div class="keyboard-hint">⌨️ Press A, B, C, or D to answer • Press Enter to submit</div>
+        <div class="timer-control" id="timerControls">
+            <label>⏱️ Show question for:</label>
+            <input type="number" id="questionDuration" min="1" max="30" value="5" step="1">
+            <span>seconds</span>
+        </div>
+        <div class="timer-control" id="timerControls2">
+            <label>📖 Show answer for:</label>
+            <input type="number" id="answerDuration" min="1" max="30" value="2" step="1">
+            <span>seconds</span>
+        </div>
+        <div class="tts-controls" id="ttsControls">
+            <div class="voice-lang-control">
+                <label>🌐 Voice:</label>
+                <div class="voice-lang-toggle">
+                    <button type="button" id="langEnBtn" class="active">EN</button>
+                    <button type="button" id="langFilBtn">FIL</button>
+                </div>
+            </div>
+            <div class="voice-warning" id="voiceWarning"></div>
+            <div class="speech-rate-control">
+                <label>🔊 Speed:</label>
+                <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1">
+                <span id="speechRateDisplay">1.0x</span>
+            </div>
+            <div class="timer-control">
+                <label>⏸️ Pause after question:</label>
+                <input type="number" id="ttsPauseDuration" min="0" max="5" value="1" step="0.5" class="tts-pause-input">
+                <span>seconds</span>
+            </div>
+        </div>
+        <div class="center-text">
+            <button id="maticBtn" class="matic-button">🤖 MATIC answering</button>
+            <button id="ttsBtn" class="tts-button" disabled>🔊 TTS (MATIC only)</button>
+        </div>
+    </div>
+
+    <div id="editContainer" class="edit-panel hidden">
+        <h2>✏️ Notepad editor</h2>
+        <div class="removed-info">
+            💾 <strong>Auto-Save Active!</strong> Your changes are saved automatically.<br>
+            📐 <strong>LaTeX Support:</strong> Use <code>$$...$$</code> for display math.<br>
+            🖼️ <strong>Image Support:</strong> Use <code>![alt text](image URL)</code> in questions or answers.<br>
+            ⌨️ <strong>Keyboard Shortcuts:</strong> Press A, B, C, or D to auto-submit answers.<br>
+            📝 <strong>(t) Syntax:</strong> Use <code>(t)</code> before question number for typed answers: <code>(t)1. question - answer</code><br>
+            🔤 <strong>Typo Handling:</strong> Minor typos show yellow feedback with corrected letters highlighted!<br>
+            🔊 <strong>TTS:</strong> Enable MATIC mode, then TTS to hear questions and answers!<br>
+            🌐 <strong>Voice Language:</strong> Switch EN / FIL inside TTS controls.
+        </div>
+        <div class="dropdown-container">
+            <div class="dropdown-header" onclick="toggleInstructions()">
+                <span>📚 How to Use</span>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="dropdown-content" id="instructionsDropdown">
+                <div class="instruction-section">
+                    <div class="instruction-title">🔊 TTS (Text-to-Speech) Mode</div>
+                    <div class="instruction-item">• Click <strong>MATIC answering</strong> first to enable auto-answer mode</div>
+                    <div class="instruction-item">• Then click <strong>TTS</strong> to enable voice narration</div>
+                    <div class="instruction-item">• TTS will read the question and then the answer</div>
+                    <div class="instruction-item">• Adjust speech speed and pause duration using the sliders</div>
+                    <div class="instruction-item">• Click TTS button again to stop and disable</div>
+                    <div class="instruction-item">• Use <strong>EN / FIL</strong> toggle to pick English or Filipino voice</div>
+                </div>
+                <div class="instruction-section">
+                    <div class="instruction-title">🔤 Typo Handling</div>
+                    <div class="instruction-item">• Minor typos are automatically accepted!</div>
+                    <div class="instruction-item">• Yellow feedback shows the corrected answer</div>
+                    <div class="instruction-item">• Click "Continue" or press Enter to proceed</div>
+                </div>
+                <div class="instruction-section">
+                    <div class="instruction-title">⌨️ Keyboard Shortcuts</div>
+                    <div class="instruction-item">• Press <strong>A, B, C, or D</strong> to instantly select and submit that option</div>
+                    <div class="instruction-item">• Press <strong>Enter</strong> to submit your typed answer</div>
+                </div>
+            </div>
+        </div>
+        <textarea id="questionNotepad" oninput="updateLivePreview()">multiple.cho()
+random(Typo and Number Test)
+(t)1. What is the correct spelling of the main character? - protagonist
+(t)2. What blood cells carry oxygen? - red blood cells
+(t)3. What is the capital of France? - Paris
+(t)4. Who wrote Romeo and Juliet? - William Shakespeare
+(t)5. What is 100? - 100
+(t)6. What is 1000? - 1,000
+(t)7. What is half? - 1/2
+(t)8. What is version 2? - version 2
+(t)9. What is the correct spelling of the word? - definitely
+(t)10. What is the powerhouse of the cell? - mitochondria
+
+multiple.cho()
+random(Multiple Choice Examples)
+1. What is the largest planet in our solar system? - Jupiter
+2. What is the chemical symbol for water? - H2O
+3. What is the fastest land animal? - cheetah
+4. What is the tallest mountain on Earth? - Mount Everest</textarea>
+        <div class="latex-preview">
+            <div class="latex-preview-title">📐 Live Preview (LaTeX + Images)</div>
+            <div id="latexPreview" class="preview-content"></div>
+        </div>
+        <div class="flex-row">
+            <button onclick="parseAndSaveNotepad()" class="auto-save-btn">🔄 APPLY & RESTART</button>
+            <button onclick="downloadJson()" class="save-as-btn">⬇ EXPORT JSON</button>
+            <button class="small" onclick="document.getElementById('importFile').click()">📂 IMPORT</button>
+            <input type="file" id="importFile" accept=".json,.txt" class="hidden" onchange="importFile(this)">
+            <button class="small" onclick="resetSubject()">♻ reset</button>
+            <button class="small" onclick="toggleEditor()">↩ back</button>
+        </div>
+        <div id="autoSaveStatus" class="auto-save-status" style="margin-top: 10px;">✓ Auto-saving enabled</div>
+    </div>
+
+    <div id="scoreContainer" class="score-panel hidden">
+        <h2>🏁 FINISHED</h2>
+        <div class="score-number" id="finalScoreDisplay">0/0</div>
+        <p id="timeTakenDisplay" style="font-size:1.3rem;">time</p>
+        <p id="averageTimeDisplay" style="font-size:1.1rem;"></p>
+        <p id="testsCompletedDisplay" style="font-size:1.1rem;"></p>
+        <div class="flex-row">
+            <button onclick="resetGame()">🔄 play again</button>
+            <button onclick="showReviewPanel()">📋 review answers</button>
+        </div>
+    </div>
+
+    <div id="reviewContainer" class="review-panel hidden">
+        <h2>🔍 review</h2>
+        <div id="reviewList"></div>
+        <button onclick="hideReview()">⬅ back</button>
+    </div>
+
+    <div id="saveNotification" class="save-notification hidden">✅ File saved!</div>
+
+    <script>
+        (function() {
+            // ============================================================
+            // UTILITIES
+            // ============================================================
+            function shuffle(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+            function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+            function esc(s) {
+                return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+            }
+
+            // ============================================================
+            // NUMBER NORMALIZATION
+            // ============================================================
+            function numberWordsToDigits(text) {
+                const wordMap = { 'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,'fourteen':14,'fifteen':15,'sixteen':16,'seventeen':17,'eighteen':18,'nineteen':19,'twenty':20,'thirty':30,'forty':40,'fifty':50,'sixty':60,'seventy':70,'eighty':80,'ninety':90,'hundred':100,'thousand':1000 };
+                const fractionMatch = text.match(/^(\w+)\s+(half|quarter)$/i);
+                if (fractionMatch) {
+                    const num = wordMap[fractionMatch[1].toLowerCase()];
+                    if (num !== undefined) {
+                        if (fractionMatch[2].toLowerCase() === 'half') return String(num / 2);
+                        else if (fractionMatch[2].toLowerCase() === 'quarter') return String(num / 4);
+                    }
+                }
+                const words = text.split(/\s+/);
+                let total = 0, current = 0, hasNumber = false;
+                for (let word of words) {
+                    const lower = word.toLowerCase();
+                    if (wordMap[lower] !== undefined) {
+                        hasNumber = true;
+                        const val = wordMap[lower];
+                        if (val === 100) { if (current === 0) current = 1; current *= 100; }
+                        else if (val === 1000) { if (current === 0) current = 1; current *= 1000; total += current; current = 0; }
+                        else { current += val; }
+                    } else {
+                        if (hasNumber) { total += current; current = 0; hasNumber = false; }
+                    }
+                }
+                total += current;
+                if (hasNumber || total > 0) return String(total);
+                return text;
+            }
+            function normalizeNumber(text) {
+                if (!text) return text;
+                let normalized = text.replace(/,/g, '');
+                normalized = numberWordsToDigits(normalized);
+                const fractionMatch = normalized.match(/^(\d+)\/(\d+)$/);
+                if (fractionMatch) {
+                    const num = parseInt(fractionMatch[1]);
+                    const den = parseInt(fractionMatch[2]);
+                    if (den !== 0) return String(num / den);
+                }
+                return normalized;
+            }
+            function isNumeric(text) {
+                const cleaned = text.replace(/,/g, '').trim();
+                return !isNaN(parseFloat(cleaned)) && isFinite(cleaned);
+            }
+            function normalizeMixedAnswer(text) {
+                if (!text) return text;
+                const trimmed = text.trim();
+                const cleanNumber = trimmed.replace(/,/g, '').trim();
+                if (isNumeric(cleanNumber)) return normalizeNumber(trimmed);
+                const parts = trimmed.split(/\s+/);
+                const normalizedParts = parts.map(part => {
+                    const cleanPart = part.replace(/,/g, '').trim();
+                    if (isNumeric(cleanPart)) return normalizeNumber(part);
+                    const wordNumber = numberWordsToDigits(part);
+                    if (wordNumber !== part && isNumeric(wordNumber)) return wordNumber;
+                    return part;
+                });
+                return normalizedParts.join(' ');
+            }
+
+            // ============================================================
+            // FUZZY MATCHING
+            // ============================================================
+            function levenshteinDistance(a, b) {
+                const matrix = [];
+                for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+                for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        if (b[i-1] === a[j-1]) matrix[i][j] = matrix[i-1][j-1];
+                        else matrix[i][j] = Math.min(matrix[i-1][j-1]+1, matrix[i][j-1]+1, matrix[i-1][j]+1);
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+            function normalizeText(text) {
+                if (!text) return '';
+                return text.toLowerCase().trim().replace(/[.,!?;:()\[\]{}\"\'“”‘’]/g, '').replace(/\s+/g, ' ').trim();
+            }
+
+            // Fix block's fuzzyMatch — exact for short/True-False/numeric, tolerance for longer
+            function fuzzyMatch(userAnswer, correctAnswer) {
+                let u = userAnswer, c = correctAnswer;
+                if (/^[tf]$/i.test(c.trim())) {
+                    const m = { true: 't', false: 'f', t: 't', f: 'f' }[u.trim().toLowerCase()];
+                    return { match: m === c.trim().toLowerCase(), isTypo: false };
+                }
+                if (/\d/.test(c)) { u = normalizeMixedAnswer(u); c = normalizeMixedAnswer(c); }
+                const tu = normalizeText(u), tc = normalizeText(c);
+                if (tu === tc) return { match: true, isTypo: false };
+                if (/\d/.test(tu) || /\d/.test(tc)) {
+                    const dg = s => (s.match(/\d+/g) || []).join(',');
+                    if (dg(tu) !== dg(tc)) return { match: false, isTypo: false };
+                }
+                const len = tc.length;
+                const max = len <= 3 ? 0 : len <= 5 ? 1 : len <= 9 ? 2 : Math.floor(len * 0.2);
+                const d = levenshteinDistance(tu, tc);
+                return { match: d <= max, isTypo: d <= max && d > 0 };
+            }
+
+            function highlightDifference(user, correct) {
+                const uw = normalizeText(user).split(' ');
+                return correct.split(' ').map((w, i) => {
+                    const u = uw[i] || '';
+                    if (normalizeText(w) === u) return esc(w);
+                    return [...w].map((ch, j) => ch.toLowerCase() === (u[j] || '') ? esc(ch) : `<span class="highlight-gold">${esc(ch)}</span>`).join('');
+                }).join(' ');
+            }
+
+            // ============================================================
+            // RENDER
+            // ============================================================
+            function convertMarkdownImages(text) {
+                if (!text) return text;
+                return text.replace(/!\[(.*?)\]\((.*?)\)/g, function(match, alt, url) {
+                    return `<img src="${url}" alt="${alt || ''}" loading="lazy" onerror="this.style.display='none'">`;
+                });
+            }
+            function renderLatexToHtml(text) {
+                if (!text) return text;
+                if (typeof text !== 'string') return text;
+                let processed = convertMarkdownImages(text);
+                const hasLatex = processed.includes('$$') || processed.includes('\\(') || processed.includes('\\[');
+                if (hasLatex) {
+                    try {
+                        processed = processed.replace(/\$\$([\s\S]+?)\$\$/g, function(match, formula) {
+                            try { return katex.renderToString(formula, { displayMode: true, throwOnError: false }); } catch(e) { return match; }
+                        });
+                        processed = processed.replace(/\\\(([\s\S]+?)\\\)/g, function(match, formula) {
+                            try { return katex.renderToString(formula, { displayMode: false, throwOnError: false }); } catch(e) { return match; }
+                        });
+                        processed = processed.replace(/\\\[([\s\S]+?)\\\]/g, function(match, formula) {
+                            try { return katex.renderToString(formula, { displayMode: true, throwOnError: false }); } catch(e) { return match; }
+                        });
+                        return processed;
+                    } catch(e) { return processed; }
+                }
+                return processed;
+            }
+            function renderLatex(element, text) {
+                if (!element || !text) return;
+                if (typeof text !== 'string') { element.innerHTML = text; return; }
+                element.innerHTML = renderLatexToHtml(text);
+            }
+            function updateLivePreview() {
+                const text = notepad.value;
+                const lines = text.split('\n');
+                const previewDiv = document.getElementById('latexPreview');
+                previewDiv.innerHTML = '';
+                let shownLines = 0;
+                for (let i = 0; i < lines.length && shownLines < 8; i++) {
+                    const line = lines[i].trim();
+                    if (line && (line.includes('$$') || line.includes('\\(') || line.includes('![') || line.includes('-') || line.startsWith('multiple.cho') || line.startsWith('random') || line.startsWith('(t)'))) {
+                        const previewLine = document.createElement('div');
+                        previewLine.className = 'preview-line';
+                        if (line.includes('-')) {
+                            let cleanLine = line;
+                            let isTyped = false;
+                            if (cleanLine.trim().startsWith('(t)')) { isTyped = true; cleanLine = cleanLine.replace(/^\(t\)\s*/, ''); }
+                            const parts = cleanLine.split('-');
+                            const question = parts[0].trim().replace(/^\d+\.\s*/, '');
+                            const answer = parts[1].trim();
+                            const qSpan = document.createElement('span');
+                            qSpan.style.color = '#ffb86b'; qSpan.style.fontWeight = 'bold';
+                            qSpan.innerHTML = isTyped ? '✏️ Q: ' : 'Q: ';
+                            const qContent = document.createElement('span');
+                            qContent.innerHTML = renderLatexToHtml(question);
+                            const aSpan = document.createElement('span');
+                            aSpan.style.color = '#5f9ea0'; aSpan.style.marginLeft = '15px'; aSpan.innerHTML = ' → ';
+                            const aContent = document.createElement('span');
+                            aContent.innerHTML = renderLatexToHtml(answer);
+                            previewLine.appendChild(qSpan); previewLine.appendChild(qContent);
+                            previewLine.appendChild(aSpan); previewLine.appendChild(aContent);
+                        } else {
+                            previewLine.innerHTML = renderLatexToHtml(line);
+                            if (line.startsWith('multiple.cho') || line.startsWith('random')) {
+                                previewLine.style.color = '#5f9ea0'; previewLine.style.fontWeight = 'bold';
+                            }
+                        }
+                        previewDiv.appendChild(previewLine);
+                        shownLines++;
+                    }
+                }
+                if (shownLines === 0) previewDiv.innerHTML = '<span style="color: #8a9bc0;">No content detected.</span>';
+            }
+
+            // ============================================================
+            // PARSE
+            // ============================================================
+            function parseQuestion(line) {
+                const dash = line.indexOf('-');
+                if (dash === -1) return null;
+                let q = line.substring(0, dash).trim().replace(/^\d+\.\s*/, '');
+                let a = line.substring(dash + 1).trim();
+                return { q, a };
+            }
+            function parseNotepad(text) {
+                const raw = text.split(/\n\s*\n/);
+                const tests = [], names = [], modes = [], removed = [], mc = [];
+                for (let t of raw) {
+                    if (!t.trim()) continue;
+                    const lines = t.split(/\r?\n/);
+                    let idx = 0, hasMC = false;
+                    if (lines[idx] && lines[idx].trim() === 'multiple.cho()') { hasMC = true; idx++; }
+                    let name = null, randMode = false, isRemoved = false;
+                    if (lines[idx]) {
+                        let first = lines[idx].trim();
+                        let rmMatch = first.match(/^random\(["']?([^"')]+)["']?\)\s*=\s*xxx$/i);
+                        if (rmMatch) { randMode = true; name = rmMatch[1].trim(); isRemoved = true; idx++; }
+                        else {
+                            let rMatch = first.match(/^random\(["']?([^"')]+)["']?\)$/i);
+                            if (rMatch) { randMode = true; name = rMatch[1].trim(); idx++; }
+                            else {
+                                let qMatch = first.match(/^["']([^"']+)["']\s*=\s*xxx$/i);
+                                if (qMatch) { name = qMatch[1].trim(); isRemoved = true; idx++; }
+                                else {
+                                    let qq = first.match(/^["']([^"']+)["']$/);
+                                    if (qq) { name = qq[1].trim(); idx++; }
+                                    else if (!first.includes('-') && first.length < 50) { name = first; idx++; }
+                                }
+                            }
+                        }
+                    }
+                    const questions = [];
+                    for (let i = idx; i < lines.length; i++) {
+                        let line = lines[i].trim();
+                        if (!line || line.startsWith('//')) continue;
+                        let isTyped = false;
+                        if (line.trim().startsWith('(t)')) { isTyped = true; line = line.replace(/^\(t\)\s*/, ''); }
+                        let p = parseQuestion(line);
+                        if (p) { p.isTyped = isTyped; questions.push(p); }
+                    }
+                    if (questions.length) {
+                        tests.push(questions); names.push(name); modes.push(randMode);
+                        removed.push(isRemoved); mc.push(hasMC);
+                    }
+                }
+                return { tests, testNames: names, testModes: modes, testRemoved: removed, testMultipleChoice: mc };
+            }
+            function getDefault() {
+                return {
+                    tests: [
+                        [
+                            { q: "What is the correct spelling of the main character?", a: "protagonist", isTyped: true },
+                            { q: "What blood cells carry oxygen?", a: "red blood cells", isTyped: true },
+                            { q: "What is the capital of France?", a: "Paris", isTyped: true },
+                            { q: "Who wrote Romeo and Juliet?", a: "William Shakespeare", isTyped: true },
+                            { q: "What is 100?", a: "100", isTyped: true },
+                            { q: "What is 1000?", a: "1,000", isTyped: true },
+                            { q: "What is half?", a: "1/2", isTyped: true },
+                            { q: "What is version 2?", a: "version 2", isTyped: true },
+                            { q: "What is the correct spelling of the word?", a: "definitely", isTyped: true },
+                            { q: "What is the powerhouse of the cell?", a: "mitochondria", isTyped: true }
+                        ],
+                        [
+                            { q: "What is the largest planet in our solar system?", a: "Jupiter", isTyped: false },
+                            { q: "What is the chemical symbol for water?", a: "H2O", isTyped: false },
+                            { q: "What is the fastest land animal?", a: "cheetah", isTyped: false },
+                            { q: "What is the tallest mountain on Earth?", a: "Mount Everest", isTyped: false }
+                        ]
+                    ],
+                    testNames: ["Typo and Number Test", "Multiple Choice Examples"],
+                    testModes: [true, true],
+                    testRemoved: [false, false],
+                    testMultipleChoice: [true, true]
+                };
+            }
+
+            // ============================================================
+            // STATE
+            // ============================================================
+            let originalQuestions = [];
+            let tests = [];
+            let testNames = [];
+            let testModes = [];
+            let testRemoved = [];
+            let testMultipleChoice = [];
+            let remainingTests = [];
+            let completedTests = [];
+            let currentTest = null;
+            let answeredQuestions = [];
+            let score = 0;
+            let startTime = Date.now();
+            let timerInterval = null;
+            let currentTime = 0;
+            let isSubmitting = false;
+            let selectedOptionIndex = -1;
+            let currentOptions = null;
+            let awaitingTypoContinue = false;
+            let typoContinueResolve = null;
+
+            // MATIC/TTS state (single source of truth: autoTimers + autoToken)
+            let maticMode = false;
+            let currentCorrectAnswer = null;
+            let ttsEnabled = false;
+            let ttsVoiceLang = 'en';
+            const speechSynth = window.speechSynthesis;
+            let currentUtterance = null;
+            let autoTimers = [];
+            let autoToken = 0;
+            let autoRevealed = false;
+
+            const correctSound = document.getElementById('correctSound');
+            const incorrectSound = document.getElementById('incorrectSound');
+
+            const gameDiv = document.getElementById('gameContainer');
+            const editDiv = document.getElementById('editContainer');
+            const scoreDiv = document.getElementById('scoreContainer');
+            const reviewDiv = document.getElementById('reviewContainer');
+            const questionEl = document.getElementById('questionText');
+            const answerInput = document.getElementById('answerInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const maticBtn = document.getElementById('maticBtn');
+            const ttsBtn = document.getElementById('ttsBtn');
+            const maticStatus = document.getElementById('maticStatus');
+            const ttsStatus = document.getElementById('ttsStatus');
+            const feedbackBox = document.getElementById('feedbackBox');
+            const typoContinueContainer = document.getElementById('typoContinueContainer');
+            const typoContinueBtn = document.getElementById('typoContinueBtn');
+            const notepad = document.getElementById('questionNotepad');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const finalScoreEl = document.getElementById('finalScoreDisplay');
+            const timeTakenEl = document.getElementById('timeTakenDisplay');
+            const averageTimeEl = document.getElementById('averageTimeDisplay');
+            const testsCompletedEl = document.getElementById('testsCompletedDisplay');
+            const reviewListEl = document.getElementById('reviewList');
+            const progressDisplay = document.getElementById('progressDisplay');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const testIndicator = document.getElementById('testIndicator');
+            const testProgress = document.getElementById('testProgress');
+            const emptyAnswerError = document.getElementById('emptyAnswerError');
+            const saveNotification = document.getElementById('saveNotification');
+            const instructionsDropdown = document.getElementById('instructionsDropdown');
+            const dropdownHeader = document.querySelector('.dropdown-header');
+            const autoSaveStatus = document.getElementById('autoSaveStatus');
+            const questionDurationInput = document.getElementById('questionDuration');
+            const answerDurationInput = document.getElementById('answerDuration');
+            const ttsPauseInput = document.getElementById('ttsPauseDuration');
+            const speechRateInput = document.getElementById('speechRate');
+            const speechRateDisplay = document.getElementById('speechRateDisplay');
+            const ttsControls = document.getElementById('ttsControls');
+            const timerControls = document.getElementById('timerControls');
+            const timerControls2 = document.getElementById('timerControls2');
+            const langEnBtn = document.getElementById('langEnBtn');
+            const langFilBtn = document.getElementById('langFilBtn');
+            const voiceWarning = document.getElementById('voiceWarning');
+
+            speechRateInput.addEventListener('input', function() {
+                speechRateDisplay.textContent = parseFloat(this.value).toFixed(1) + 'x';
+            });
+
+            // ============================================================
+            // VOICE / LANGUAGE SELECTION
+            // ============================================================
+            function findVoice(lang) {
+                const voices = speechSynth.getVoices() || [];
+                if (lang === 'fil') {
+                    return voices.find(v => {
+                        const l = (v.lang || '').toLowerCase();
+                        return l.startsWith('fil') || l.startsWith('tl') || /filipino|tagalog/i.test(v.name);
+                    }) || null;
+                }
+                return voices.find(v => (v.lang || '').toLowerCase().startsWith('en-us'))
+                    || voices.find(v => (v.lang || '').toLowerCase().startsWith('en'))
+                    || null;
+            }
+            function refreshVoiceAvailability() {
+                const hasFil = !!findVoice('fil');
+                const hasEn  = !!findVoice('en');
+                langEnBtn.classList.toggle('active', ttsVoiceLang === 'en');
+                langFilBtn.classList.toggle('active', ttsVoiceLang === 'fil');
+                let warn = '';
+                if (ttsVoiceLang === 'fil' && !hasFil) {
+                    warn = '⚠️ No Filipino voice on this device. Falling back to English. On Windows: Settings → Time & Language → Language & region → add Filipino.';
+                } else if (ttsVoiceLang === 'en' && !hasEn) {
+                    warn = '⚠️ No English voice found. TTS may use the system default.';
+                }
+                if (warn) { voiceWarning.textContent = warn; voiceWarning.classList.add('visible'); }
+                else voiceWarning.classList.remove('visible');
+            }
+            function setVoiceLang(lang) { ttsVoiceLang = lang; refreshVoiceAvailability(); }
+            langEnBtn.addEventListener('click', () => setVoiceLang('en'));
+            langFilBtn.addEventListener('click', () => setVoiceLang('fil'));
+            if (typeof speechSynth.onvoiceschanged !== 'undefined') {
+                speechSynth.onvoiceschanged = refreshVoiceAvailability;
+            }
+
+            // ============================================================
+            // MATIC / TTS — single cycle, always correct
+            // ============================================================
+            function clearAuto() {
+                autoToken++;
+                autoTimers.forEach(clearTimeout);
+                autoTimers = [];
+                if (speechSynth.speaking || speechSynth.pending) speechSynth.cancel();
+                ttsStatus.classList.add('hidden');
+                const d = document.getElementById('maticAnswerDisplay');
+                if (d) d.remove();
+            }
+            function autoWait(fn, ms) {
+                const t = autoToken;
+                autoTimers.push(setTimeout(() => { if (t === autoToken && maticMode) fn(); }, ms));
+            }
+            function autoSpeak(text, fn) {
+                if (!ttsEnabled) { fn(); return; }
+                const t = autoToken;
+                const clean = String(text).replace(/<[^>]*>/g, '').replace(/\$\$[\s\S]*?\$\$/g, '').replace(/\\\([\s\S]*?\\\)/g, '');
+                const u = new SpeechSynthesisUtterance(clean);
+                const v = findVoice(ttsVoiceLang);
+                if (v) { u.voice = v; u.lang = v.lang; }
+                else { u.lang = (ttsVoiceLang === 'fil') ? 'fil-PH' : 'en-US'; }
+                u.rate = parseFloat(speechRateInput.value) || 1;
+                let done = false;
+                const fin = () => { if (done) return; done = true; if (t === autoToken && maticMode) fn(); };
+                u.onend = fin; u.onerror = fin;
+                currentUtterance = u;
+                ttsStatus.textContent = '🔊 Speaking...';
+                ttsStatus.classList.remove('hidden');
+                speechSynth.speak(u);
+            }
+            function runAutoCycle() {
+                if (!maticMode || !currentTest) return;
+                const q = currentTest.questions[currentTest.currentIndex];
+                if (!q) return;
+                clearAuto();
+                autoRevealed = false;
+                const qs = (parseFloat(questionDurationInput.value) || 5) * 1000;
+                const as = (parseFloat(answerDurationInput.value) || 2) * 1000;
+                const pause = (parseFloat(ttsPauseInput.value) || 0) * 1000;
+                maticStatus.innerHTML = ttsEnabled ? '🔊 Reading question...' : `🤖 Showing question...<br>⏱️ Answering in ${qs / 1000} seconds...`;
+                maticStatus.classList.remove('hidden');
+                autoSpeak(q.q, () => autoWait(() => revealAuto(q, as), ttsEnabled ? pause : qs));
+            }
+            function revealAuto(q, as) {
+                autoRevealed = true;
+                const box = document.createElement('div');
+                box.id = 'maticAnswerDisplay';
+                box.style.cssText = 'background:#2e8b57;color:white;padding:15px;border-radius:30px;margin:10px 0;text-align:center;font-size:1.2rem;font-weight:bold;border-left:5px solid #a0ffa0;';
+                renderLatex(box, '✅ Answer: ' + q.a);
+                gameDiv.insertBefore(box, maticStatus);
+
+                if (currentOptions) {
+                    const i = currentOptions.findIndex(o => o.text === q.a);
+                    const opts = document.querySelectorAll('.option-item');
+                    if (opts[i]) opts[i].classList.add('correct-highlight');
+                } else {
+                    answerInput.value = q.a;
+                }
+                feedbackBox.className = 'feedback-box';
+                feedbackBox.textContent = '✅ Correct!';
+                feedbackBox.classList.remove('hidden');
+                submitBtn.classList.add('correct-feedback');
+                correctSound.play().catch(() => {});
+
+                score++;
+                answeredQuestions.push({ ...q, userAnswer: q.a, isCorrect: true, time: currentTime, testId: currentTest.originalId });
+                currentTest.currentIndex++;
+
+                maticStatus.innerHTML = ttsEnabled ? '🔊 Reading answer...' : `🤖 Showing answer...<br>⏱️ Moving to next in ${as / 1000} seconds...`;
+                autoSpeak('The answer is ' + q.a, () => autoWait(advanceAuto, ttsEnabled ? 800 : as));
+            }
+            function advanceAuto() {
+                clearAuto();
+                if (!currentTest) return;
+                if (currentTest.currentIndex >= currentTest.questions.length) loadNextTest();
+                else loadQuestion();
+            }
+            function processNextMaticQuestion() { if (autoRevealed) advanceAuto(); else runAutoCycle(); }
+            function processNextTTSQuestion() { processNextMaticQuestion(); }
+            function restoreManualModeUI() {
+                if (currentTest && currentTest.currentIndex < currentTest.questions.length) loadQuestion();
+            }
+
+            // ============================================================
+            // MULTIPLE CHOICE — no duplicate options
+            // ============================================================
+            function generateOptions(q, pool) {
+                const uniq = arr => [...new Set(arr.filter(a => a !== q.a))];
+                let d = shuffle(uniq(pool.map(x => x.a))).slice(0, 3);
+                if (d.length < 3) {
+                    const extra = shuffle(uniq(originalQuestions.map(x => x.a)).filter(a => !d.includes(a)));
+                    d = d.concat(extra.slice(0, 3 - d.length));
+                }
+                return shuffle([q.a, ...d]).map((t, i) => ({ number: i + 1, text: t }));
+            }
+            function displayOptions(opts) {
+                if (!opts || !opts.length) return;
+                optionsContainer.innerHTML = '';
+                selectedOptionIndex = -1;
+                const keys = ['A', 'B', 'C', 'D'];
+                opts.slice(0, 4).forEach((opt, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'option-item';
+                    div.onclick = () => { if (!maticMode && !ttsEnabled) selectAndSubmit(idx); };
+                    const prefix = document.createElement('span');
+                    prefix.className = 'option-prefix';
+                    prefix.textContent = `${keys[idx]}.`;
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'option-text';
+                    renderLatex(textSpan, opt.text);
+                    const hint = document.createElement('span');
+                    hint.className = 'option-key-hint';
+                    hint.textContent = `[${keys[idx]}]`;
+                    div.appendChild(prefix); div.appendChild(textSpan); div.appendChild(hint);
+                    optionsContainer.appendChild(div);
+                });
+            }
+            function selectAndSubmit(idx) {
+                if (isSubmitting) return;
+                if (!currentTest || !currentOptions || idx >= currentOptions.length) return;
+                isSubmitting = true;
+                selectedOptionIndex = idx;
+                const userAnswer = currentOptions[idx].text;
+                const q = currentTest.questions[currentTest.currentIndex];
+                const correct = q.a;
+                const isCorrect = userAnswer.localeCompare(correct, undefined, { sensitivity: 'accent' }) === 0;
+
+                const opts = document.querySelectorAll('.option-item');
+                opts.forEach((opt, i) => opt.classList.remove('correct-highlight', 'wrong-highlight'));
+                if (!isCorrect && opts[idx]) opts[idx].classList.add('wrong-highlight');
+                const correctOptionIndex = currentOptions.findIndex(opt => opt.text === correct);
+                if (correctOptionIndex !== -1 && opts[correctOptionIndex]) opts[correctOptionIndex].classList.add('correct-highlight');
+
+                if (isCorrect) { correctSound.play().catch(()=>{}); score++; submitBtn.classList.add('correct-feedback'); }
+                else { incorrectSound.play().catch(()=>{}); submitBtn.classList.add('wrong-feedback'); }
+
+                answeredQuestions.push({ ...q, userAnswer, isCorrect, time: currentTime, testId: currentTest.originalId });
+                currentTest.currentIndex++;
+                const delay = isCorrect ? 0 : 2000;
+                setTimeout(() => {
+                    if (currentTest.currentIndex >= currentTest.questions.length) loadNextTest();
+                    else loadQuestion();
+                    submitBtn.classList.remove('correct-feedback', 'wrong-feedback');
+                    isSubmitting = false;
+                }, delay);
+            }
+
+            // ============================================================
+            // LOAD QUESTION
+            // ============================================================
+            function loadQuestion() {
+                if (!currentTest) return;
+                const q = currentTest.questions[currentTest.currentIndex];
+                if (!q) return;
+                renderLatex(questionEl, q.q);
+                submitBtn.classList.remove('correct-feedback', 'wrong-feedback', 'typo-feedback');
+                feedbackBox.classList.add('hidden');
+                typoContinueContainer.classList.add('hidden');
+                awaitingTypoContinue = false;
+                typoContinueResolve = null;
+
+                if (currentTest.isMC && !q.isTyped) {
+                    currentOptions = generateOptions(q, currentTest.questions);
+                    displayOptions(currentOptions);
+                    answerInput.classList.add('hidden');
+                    optionsContainer.classList.remove('hidden');
+                } else {
+                    currentOptions = null;
+                    optionsContainer.classList.add('hidden');
+                    answerInput.classList.remove('hidden');
+                    answerInput.value = '';
+                    if (!maticMode) setTimeout(() => answerInput.focus(), 100);
+                }
+                isSubmitting = false;
+                selectedOptionIndex = -1;
+                const total = originalQuestions.filter(x => !testRemoved[x.testId]).length;
+                progressDisplay.innerText = `📊 ${answeredQuestions.length}/${total} answered`;
+                testProgress.innerText = `📌 ${currentTest.currentIndex + 1}/${currentTest.questions.length}`;
+                if (maticMode) runAutoCycle();
+            }
+
+            // ============================================================
+            // TYPED ANSWER SUBMIT
+            // ============================================================
+            function submitTypedAnswer() {
+                if (isSubmitting || !currentTest || maticMode) return;
+                const q = currentTest.questions[currentTest.currentIndex];
+                if (!q) return;
+                const userAnswer = answerInput.value.trim();
+                if (!userAnswer) {
+                    emptyAnswerError.textContent = '⚠️ Please enter an answer before submitting';
+                    showEmptyError();
+                    return;
+                }
+                isSubmitting = true;
+                const r = fuzzyMatch(userAnswer, q.a);
+                const advance = () => {
+                    answeredQuestions.push({ ...q, userAnswer, isCorrect: r.match, time: currentTime, testId: currentTest.originalId });
+                    currentTest.currentIndex++;
+                    if (currentTest.currentIndex >= currentTest.questions.length) loadNextTest();
+                    else loadQuestion();
+                };
+                if (r.match) {
+                    correctSound.play().catch(() => {});
+                    score++;
+                    if (r.isTypo) {
+                        feedbackBox.className = 'feedback-box typo';
+                        feedbackBox.innerHTML = `
+                            <div style="margin-bottom:5px;">📝 You typed:</div>
+                            <div style="color:#0b0f1c;margin-bottom:10px;">"${esc(userAnswer)}"</div>
+                            <div style="margin-bottom:5px;">✅ Correct spelling:</div>
+                            <div style="font-weight:bold;font-size:1.2rem;">"${highlightDifference(userAnswer, q.a)}"</div>
+                            <div style="margin-top:10px;font-size:0.9rem;color:#0b0f1c;">🟡 Typo accepted as correct!</div>`;
+                        feedbackBox.classList.remove('hidden');
+                        submitBtn.classList.add('typo-feedback');
+                        typoContinueContainer.classList.remove('hidden');
+                        waitForTypoContinue().then(() => { typoContinueContainer.classList.add('hidden'); advance(); });
+                    } else {
+                        feedbackBox.className = 'feedback-box';
+                        feedbackBox.textContent = '✅ Correct!';
+                        feedbackBox.classList.remove('hidden');
+                        submitBtn.classList.add('correct-feedback');
+                        setTimeout(advance, 500);
+                    }
+                } else {
+                    incorrectSound.play().catch(() => {});
+                    submitBtn.classList.add('wrong-feedback');
+                    feedbackBox.className = 'feedback-box wrong';
+                    feedbackBox.innerHTML = '';
+                    const span = document.createElement('span');
+                    renderLatex(span, `❌ Incorrect. The correct answer is: "${q.a}"`);
+                    feedbackBox.appendChild(span);
+                    feedbackBox.classList.remove('hidden');
+                    setTimeout(advance, 2000);
+                }
+            }
+            function forceCheckAnswer() {
+                if (maticMode) return;
+                if (awaitingTypoContinue) {
+                    if (typoContinueResolve) { typoContinueResolve(); typoContinueResolve = null; awaitingTypoContinue = false; }
+                    return;
+                }
+                if (!currentTest) return;
+                const q = currentTest.questions[currentTest.currentIndex];
+                if (!q) return;
+                if (currentOptions && !q.isTyped) {
+                    emptyAnswerError.textContent = '⚠️ Pick an option or press A, B, C or D';
+                    emptyAnswerError.classList.add('visible');
+                    setTimeout(() => emptyAnswerError.classList.remove('visible'), 2000);
+                    return;
+                }
+                submitTypedAnswer();
+            }
+            function showEmptyError() {
+                answerInput.classList.add('error');
+                emptyAnswerError.classList.add('visible');
+                setTimeout(() => {
+                    answerInput.classList.remove('error');
+                    emptyAnswerError.classList.remove('visible');
+                }, 2000);
+            }
+            function resetError() {
+                answerInput.classList.remove('error');
+                emptyAnswerError.classList.remove('visible');
+            }
+
+            // ============================================================
+            // TYPO CONTINUE
+            // ============================================================
+            typoContinueBtn.addEventListener('click', function() {
+                if (typoContinueResolve) { typoContinueResolve(); typoContinueResolve = null; awaitingTypoContinue = false; }
+            });
+            function waitForTypoContinue() {
+                return new Promise((resolve) => {
+                    awaitingTypoContinue = true;
+                    typoContinueResolve = resolve;
+                    typoContinueContainer.classList.remove('hidden');
+                });
+            }
+
+            // ============================================================
+            // MATIC / TTS TOGGLES
+            // ============================================================
+            function startMaticMode() {
+                if (maticMode) { stopMaticMode(); return; }
+                maticMode = true;
+                maticBtn.classList.add('active');
+                maticBtn.textContent = '⏹️ MATIC active (click to stop)';
+                maticStatus.classList.remove('hidden');
+                maticStatus.innerHTML = '🤖 MATIC mode active - Auto-answering in progress...';
+                maticStatus.style.background = '#2e8b57';
+                maticStatus.style.padding = '12px';
+                maticStatus.style.borderRadius = '30px';
+                maticStatus.style.textAlign = 'center';
+                maticStatus.style.margin = '10px 0';
+                maticStatus.style.fontWeight = 'bold';
+
+                ttsBtn.disabled = false;
+                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.classList.remove('active');
+                ttsControls.classList.add('disabled');
+
+                runAutoCycle();
+            }
+            function stopMaticMode() {
+                clearAuto();
+                autoRevealed = false;
+                maticMode = false;
+                maticBtn.classList.remove('active');
+                maticBtn.textContent = '🤖 MATIC answering';
+                maticStatus.classList.add('hidden');
+                submitBtn.disabled = false;
+                answerInput.disabled = false;
+                const maticDisplay = document.getElementById('maticAnswerDisplay');
+                if (maticDisplay) maticDisplay.remove();
+
+                if (ttsEnabled) disableTTS();
+
+                timerControls.style.opacity = '1';
+                timerControls.style.pointerEvents = 'auto';
+                timerControls2.style.opacity = '1';
+                timerControls2.style.pointerEvents = 'auto';
+
+                ttsBtn.disabled = true;
+                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.classList.remove('active');
+                ttsControls.classList.add('disabled');
+
+                restoreManualModeUI();
+            }
+            function enableTTS() {
+                if (!maticMode) { alert('Please enable MATIC mode first!'); return; }
+                ttsEnabled = true;
+                ttsBtn.classList.add('active');
+                ttsBtn.textContent = '🔊 TTS ON (click to stop)';
+                ttsControls.classList.remove('disabled');
+                timerControls.style.opacity = '0.4';
+                timerControls.style.pointerEvents = 'none';
+                timerControls2.style.opacity = '0.4';
+                timerControls2.style.pointerEvents = 'none';
+                refreshVoiceAvailability();
+                clearAuto();
+                autoRevealed = false;
+                runAutoCycle();
+            }
+            function disableTTS() {
+                ttsEnabled = false;
+                if (speechSynth.speaking || speechSynth.pending) speechSynth.cancel();
+                ttsBtn.classList.remove('active');
+                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsControls.classList.add('disabled');
+                ttsStatus.classList.add('hidden');
+                timerControls.style.opacity = '1';
+                timerControls.style.pointerEvents = 'auto';
+                timerControls2.style.opacity = '1';
+                timerControls2.style.pointerEvents = 'auto';
+            }
+            function toggleTTS() {
+                if (ttsEnabled) disableTTS();
+                else enableTTS();
+            }
+
+            // ============================================================
+            // GAME FLOW
+            // ============================================================
+            function load() {
+                const stored = localStorage.getItem('quiz_tests');
+                if (stored) {
+                    try {
+                        const d = JSON.parse(stored);
+                        tests = d.tests; testNames = d.names; testModes = d.modes;
+                        testRemoved = d.removed; testMultipleChoice = d.mc;
+                    } catch { resetToDefault(); }
+                } else { resetToDefault(); }
+                originalQuestions = [];
+                tests.forEach((t, id) => t.forEach(q => originalQuestions.push({ ...q, testId: id })));
+                updateNotepad();
+            }
+            function resetToDefault() {
+                const d = getDefault();
+                tests = d.tests; testNames = d.testNames; testModes = d.testModes;
+                testRemoved = d.testRemoved; testMultipleChoice = d.testMultipleChoice;
+            }
+            function updateNotepad() {
+                const lines = [];
+                tests.forEach((test, i) => {
+                    if (testMultipleChoice[i]) lines.push('multiple.cho()');
+                    if (testNames[i]) {
+                        if (testModes[i]) {
+                            if (testRemoved[i]) lines.push(`random(${testNames[i]}) = xxx`);
+                            else lines.push(`random(${testNames[i]})`);
+                        } else {
+                            if (testRemoved[i]) lines.push(`"${testNames[i]}" = xxx`);
+                            else lines.push(`"${testNames[i]}"`);
+                        }
+                    }
+                    test.forEach((q, j) => {
+                        let line = `${j+1}. ${q.q} - ${q.a}`;
+                        if (q.isTyped) line = `(t)${line}`;
+                        lines.push(line);
+                    });
+                    if (i < tests.length - 1) lines.push('');
+                });
+                notepad.value = lines.join('\n');
+                autoSaveNotepad();
+                updateLivePreview();
+            }
+            function autoSaveNotepad() {
+                const content = notepad.value;
+                localStorage.setItem('quiz_notepad_backup', content);
+                if (autoSaveStatus) {
+                    autoSaveStatus.textContent = '✓ Auto-saved';
+                    autoSaveStatus.style.color = '#2e8b57';
+                    setTimeout(() => { if (autoSaveStatus) autoSaveStatus.textContent = '✓ Auto-saving enabled'; }, 1500);
+                }
+            }
+            function loadAutoSavedNotepad() {
+                const saved = localStorage.getItem('quiz_notepad_backup');
+                if (saved) { notepad.value = saved; updateLivePreview(); }
+            }
+            function prepareQuestions(test, id) {
+                const qs = [...test];
+                if (testModes[id]) return shuffle(qs);
+                return qs;
+            }
+            function getTestName(id, oid) { return testNames[oid] || `Test ${oid + 1}`; }
+            function updateTestIndicator() {
+                if (currentTest) {
+                    const mode = testModes[currentTest.originalId] ? '🔄' : '📋';
+                    const left = remainingTests.length;
+                    const mc = currentTest.isMC ? ' 🎯' : ' ✏️';
+                    testIndicator.innerHTML = `📚 ${currentTest.name}${mc} | ${left} left <span class="test-mode-badge">${mode}</span>`;
+                }
+            }
+
+            function resetGame() {
+                if (maticMode) stopMaticMode();
+                if (ttsEnabled) disableTTS();
+                clearAuto();
+                autoRevealed = false;
+
+                const all = tests.map((t, id) => ({
+                    questions: [...t], originalId: id, name: getTestName(id, id),
+                    removed: testRemoved[id], isMC: testMultipleChoice[id]
+                })).filter(t => !t.removed);
+
+                remainingTests = shuffle([...all]);
+                completedTests = [];
+                currentTest = null;
+                answeredQuestions = [];
+                score = 0;
+                isSubmitting = false;
+                selectedOptionIndex = -1;
+                currentOptions = null;
+                submitBtn.classList.remove('correct-feedback', 'wrong-feedback', 'typo-feedback');
+                feedbackBox.classList.add('hidden');
+                typoContinueContainer.classList.add('hidden');
+                awaitingTypoContinue = false;
+                typoContinueResolve = null;
+                stopTimer();
+                currentTime = 0;
+                updateTimer();
+                startTimer();
+                gameDiv.classList.remove('hidden');
+                editDiv.classList.add('hidden');
+                scoreDiv.classList.add('hidden');
+                reviewDiv.classList.add('hidden');
+                submitBtn.disabled = false;
+                answerInput.disabled = false;
+                ttsBtn.disabled = true;
+                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.classList.remove('active');
+                ttsControls.classList.add('disabled');
+                timerControls.style.opacity = '1';
+                timerControls.style.pointerEvents = 'auto';
+                timerControls2.style.opacity = '1';
+                timerControls2.style.pointerEvents = 'auto';
+                optionsContainer.classList.add('hidden');
+                answerInput.classList.remove('hidden');
+                if (remainingTests.length) loadNextTest();
+                else alert('No active tests!');
+            }
+
+            function loadNextTest() {
+                if (currentTest && currentTest.currentIndex < currentTest.questions.length) {
+                    loadQuestion();
+                    return;
+                }
+                if (currentTest && currentTest.currentIndex >= currentTest.questions.length) {
+                    completedTests.push({ id: currentTest.originalId, questions: currentTest.questions, name: currentTest.name });
+                }
+                if (!remainingTests.length) {
+                    stopTimer();
+                    finalizeScore();
+                    if (maticMode) stopMaticMode();
+                    if (ttsEnabled) disableTTS();
+                    return;
+                }
+                const rand = Math.floor(Math.random() * remainingTests.length);
+                const next = remainingTests[rand];
+                remainingTests.splice(rand, 1);
+                const prepared = prepareQuestions(next.questions, next.originalId);
+                currentTest = {
+                    questions: prepared, originalId: next.originalId,
+                    name: next.name, isMC: next.isMC, currentIndex: 0
+                };
+                updateTestIndicator();
+                loadQuestion();
+            }
+
+            // ============================================================
+            // SCORE / REVIEW
+            // ============================================================
+            function finalizeScore() {
+                gameDiv.classList.add('hidden');
+                scoreDiv.classList.remove('hidden');
+                const total = currentTime;
+                const mins = Math.floor(total/60);
+                const secs = total%60;
+                timeTakenEl.innerText = `⏱️ ${mins}m ${secs}s`;
+                const totalQ = originalQuestions.filter((_, i) => !testRemoved[originalQuestions[i].testId]).length;
+                const avg = total / totalQ;
+                const avgM = Math.floor(avg/60);
+                const avgS = Math.floor(avg%60);
+                averageTimeEl.innerText = `⚡ ${avgM > 0 ? avgM + 'm ' : ''}${avgS}s/q`;
+                const active = tests.filter((_, i) => !testRemoved[i]).length;
+                testsCompletedEl.innerText = `📚 ${completedTests.length}/${active} tests`;
+                finalScoreEl.innerText = `${score}/${totalQ}`;
+            }
+            function showReview() {
+                scoreDiv.classList.add('hidden');
+                reviewDiv.classList.remove('hidden');
+                reviewListEl.innerHTML = '';
+                const sorted = [...answeredQuestions].sort((a, b) => {
+                    if (a.testId !== b.testId) return a.testId - b.testId;
+                    const ta = tests[a.testId], tb = tests[b.testId];
+                    const ia = ta.findIndex(q => q.q === a.q && q.a === a.a);
+                    const ib = tb.findIndex(q => q.q === b.q && q.a === b.a);
+                    return ia - ib;
+                });
+                sorted.forEach(q => {
+                    const div = document.createElement('div');
+                    div.className = `review-item ${q.isCorrect ? 'correct' : 'incorrect'}`;
+                    const mins = Math.floor(q.time / 60);
+                    const secs = q.time % 60;
+                    const name = getTestName(q.testId, q.testId);
+                    const mode = testModes[q.testId] ? '🔄' : '📋';
+                    const mc = testMultipleChoice[q.testId] ? ' MC' : ' TA';
+                    const questionSpan = document.createElement('span');
+                    renderLatex(questionSpan, q.q);
+                    const answerSpan = document.createElement('span');
+                    renderLatex(answerSpan, q.userAnswer);
+                    const correctSpan = document.createElement('span');
+                    renderLatex(correctSpan, q.a);
+                    div.innerHTML = `<p><strong>${questionSpan.innerHTML}</strong></p><p>📝 ${answerSpan.innerHTML}</p><p>✅ ${correctSpan.innerHTML}</p><p style="color:#8a9bc0;font-size:0.85rem;">⏱️ ${mins > 0 ? mins + 'm ' : ''}${secs}s</p><p style="color:#5f9ea0;font-size:0.85rem;">📚 ${name}${mc} <span style="background:#3c4b6a;padding:2px 8px;border-radius:12px;">${mode}</span></p>`;
+                    reviewListEl.appendChild(div);
+                });
+            }
+            function hideReview() {
+                reviewDiv.classList.add('hidden');
+                scoreDiv.classList.remove('hidden');
+            }
+
+            // ============================================================
+            // TIMER
+            // ============================================================
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                startTime = Date.now() - currentTime * 1000;
+                timerInterval = setInterval(() => {
+                    currentTime = Math.floor((Date.now() - startTime) / 1000);
+                    const m = Math.floor(currentTime / 60);
+                    const s = currentTime % 60;
+                    timerDisplay.innerHTML = `⏱️ ${m}:${s.toString().padStart(2, '0')}`;
+                    if (currentTime > 300) timerDisplay.classList.add('timer-warning');
+                    else timerDisplay.classList.remove('timer-warning');
+                }, 100);
+            }
+            function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+            function updateTimer() {
+                const m = Math.floor(currentTime / 60);
+                const s = currentTime % 60;
+                timerDisplay.innerHTML = `⏱️ ${m}:${s.toString().padStart(2, '0')}`;
+            }
+
+            // ============================================================
+            // EDITOR
+            // ============================================================
+            function toggleEditor() {
+                if (editDiv.classList.contains('hidden')) {
+                    updateNotepad();
+                    gameDiv.classList.add('hidden');
+                    scoreDiv.classList.add('hidden');
+                    reviewDiv.classList.add('hidden');
+                    editDiv.classList.remove('hidden');
+                    instructionsDropdown.classList.remove('show');
+                    dropdownHeader.classList.remove('open');
+                    if (maticMode) stopMaticMode();
+                    if (ttsEnabled) disableTTS();
+                    stopTimer();
+                } else {
+                    editDiv.classList.add('hidden');
+                    gameDiv.classList.remove('hidden');
+                    if (remainingTests.length || (currentTest && currentTest.currentIndex < currentTest.questions.length)) startTimer();
+                }
+            }
+            function parseAndSaveNotepad() {
+                const parsed = parseNotepad(notepad.value);
+                tests = parsed.tests; testNames = parsed.testNames; testModes = parsed.testModes;
+                testRemoved = parsed.testRemoved; testMultipleChoice = parsed.testMultipleChoice;
+                originalQuestions = [];
+                tests.forEach((t, id) => t.forEach(q => originalQuestions.push({ ...q, testId: id })));
+                saveAndRestart();
+                toggleEditor();
+            }
+            function saveAndRestart() {
+                localStorage.setItem(currentSubject === 'local' ? 'quiz_tests' : 'quiz_edit_' + currentSubject, JSON.stringify({ tests, names: testNames, modes: testModes, removed: testRemoved, mc: testMultipleChoice }));
+                resetGame();
+            }
+            let currentSubject = 'local';
+            const subjectSelect = document.getElementById('subjectSelect');
+            const editKey = f => f === 'local' ? 'quiz_tests' : 'quiz_edit_' + f;
+            function applyData(d) {
+                tests = d.tests; testNames = d.names; testModes = d.modes;
+                testRemoved = d.removed; testMultipleChoice = d.mc;
+                originalQuestions = [];
+                tests.forEach((t, id) => t.forEach(q => originalQuestions.push({ ...q, testId: id })));
+                updateNotepad();
+            }
+            function fallbackLoad() {
+                let d = null;
+                const st = localStorage.getItem('quiz_tests');
+                if (st) { try { d = JSON.parse(st); } catch {} }
+                if (!d) { resetToDefault(); d = { tests, names: testNames, modes: testModes, removed: testRemoved, mc: testMultipleChoice }; }
+                applyData(d);
+            }
+            async function loadSubject(file) {
+                currentSubject = file;
+                localStorage.setItem('quiz_last_subject', file);
+                let d = null;
+                const edit = localStorage.getItem(editKey(file));
+                if (edit) { try { d = JSON.parse(edit); } catch {} }
+                if (!d) {
+                    const r = await fetch('data/' + file + '?v=' + Date.now());
+                    if (!r.ok) throw new Error('missing');
+                    d = await r.json();
+                }
+                applyData(d);
+            }
+            async function bootstrap() {
+                try {
+                    const r = await fetch('data/index.json?v=' + Date.now());
+                    if (!r.ok) throw new Error('no manifest');
+                    const list = await r.json();
+                    subjectSelect.innerHTML = list.map(x => `<option value="${x.file}">${x.name}</option>`).join('');
+                    const last = localStorage.getItem('quiz_last_subject');
+                    const pick = list.find(x => x.file === last) || list[0];
+                    subjectSelect.value = pick.file;
+                    await loadSubject(pick.file);
+                } catch (e) {
+                    subjectSelect.classList.add('hidden');
+                    currentSubject = 'local';
+                    fallbackLoad();
+                }
+                resetGame();
+            }
+            subjectSelect.onchange = async () => {
+                try { await loadSubject(subjectSelect.value); } catch { alert('Could not load that subject.'); return; }
+                resetGame();
+            };
+            function downloadJson() {
+                const p = parseNotepad(notepad.value);
+                const d = { tests: p.tests, names: p.testNames, modes: p.testModes, removed: p.testRemoved, mc: p.testMultipleChoice };
+                const label = (subjectSelect.selectedOptions[0] && subjectSelect.selectedOptions[0].text) || 'quiz';
+                const base = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'quiz';
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' }));
+                a.download = base + '.json'; a.click(); URL.revokeObjectURL(a.href);
+                saveNotification.classList.remove('hidden');
+                setTimeout(() => saveNotification.classList.add('hidden'), 3000);
+            }
+            function importFile(input) {
+                const f = input.files[0]; if (!f) return;
+                const rd = new FileReader();
+                rd.onload = () => {
+                    if (/\.json$/i.test(f.name)) {
+                        try { applyData(JSON.parse(rd.result)); } catch { alert('Invalid JSON file'); return; }
+                    } else { notepad.value = rd.result; }
+                    updateLivePreview();
+                    input.value = '';
+                };
+                rd.readAsText(f);
+            }
+            function resetSubject() {
+                localStorage.removeItem(editKey(currentSubject));
+                location.reload();
+            }
+
+
+
+            // ============================================================
+            // EVENT LISTENERS
+            // ============================================================
+            function setupEventListeners() {
+                submitBtn.onclick = () => { forceCheckAnswer(); submitBtn.blur(); };
+                answerInput.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') { e.preventDefault(); forceCheckAnswer(); }
+                });
+                answerInput.addEventListener('input', () => resetError());
+
+                document.addEventListener('keydown', e => {
+                    if (gameDiv.classList.contains('hidden') || maticMode) return;
+                    if (e.ctrlKey || e.metaKey || e.altKey) return;
+                    const tag = e.target.tagName;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON') return;
+
+                    if (e.key === 'Enter') {
+                        const q = currentTest && currentTest.questions[currentTest.currentIndex];
+                        if (awaitingTypoContinue || (q && q.isTyped)) { e.preventDefault(); forceCheckAnswer(); }
+                        return;
+                    }
+                    const idx = 'abcd'.indexOf(e.key.toLowerCase());
+                    if (e.key.length === 1 && idx !== -1 && currentOptions && !isSubmitting) {
+                        e.preventDefault();
+                        if (idx < currentOptions.length) selectAndSubmit(idx);
+                    }
+                });
+
+                document.addEventListener('click', e => {
+                    if (gameDiv.classList.contains('hidden') || maticMode) return;
+                    const q = currentTest && currentTest.questions[currentTest.currentIndex];
+                    if (q && q.isTyped && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                        setTimeout(() => answerInput.focus(), 50);
+                    }
+                });
+
+                maticBtn.onclick = () => { if (maticMode) stopMaticMode(); else startMaticMode(); };
+                ttsBtn.onclick = () => {
+                    if (!maticMode) { alert('Please enable MATIC mode first!'); return; }
+                    toggleTTS();
+                };
+            }
+
+            // ============================================================
+            // EXPOSE
+            // ============================================================
+            window.toggleInstructions = () => {
+                instructionsDropdown.classList.toggle('show');
+                dropdownHeader.classList.toggle('open');
+            };
+            window.toggleEditor = toggleEditor;
+            window.parseAndSaveNotepad = parseAndSaveNotepad;
+            window.downloadJson = downloadJson;
+            window.importFile = importFile;
+            window.resetSubject = resetSubject;
+            window.resetGame = resetGame;
+            window.showReviewPanel = showReview;
+            window.hideReview = hideReview;
+            window.autoSaveNotepad = autoSaveNotepad;
+            window.updateLivePreview = updateLivePreview;
+            window.forceCheckAnswer = forceCheckAnswer;
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            setupEventListeners();
+            bootstrap();
+            ttsControls.classList.add('disabled');
+            ttsBtn.disabled = true;
+            updateLivePreview();
+            refreshVoiceAvailability();
+
+            console.log('Quiz initialized successfully');
+            console.log('Current test:', currentTest);
+            console.log('Remaining tests:', remainingTests.length);
+            isSubmitting = false;
+        })();
+    </script>
+</body>
+</html>
