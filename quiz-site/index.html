@@ -103,7 +103,7 @@
         .voice-lang-toggle button:active { transform: none; box-shadow: none; }
         .voice-warning { font-size: 0.85rem; color: #ffb86b; text-align: center; margin-top: 6px; display: none; }
         .voice-warning.visible { display: block; }
-    .subject-select{position:fixed;top:20px;left:20px;z-index:999;width:auto;max-width:55vw;padding:10px 16px;margin:0;font-size:1rem;border-radius:40px;background:#242c3f;color:#fff;border:2px solid #414e6b;}
+        .subject-select{position:fixed;top:20px;left:20px;z-index:999;width:auto;max-width:55vw;padding:10px 16px;margin:0;font-size:1rem;border-radius:40px;background:#242c3f;color:#fff;border:2px solid #414e6b;}
     </style>
 </head>
 <body>
@@ -370,7 +370,6 @@ random(Multiple Choice Examples)
                 return text.toLowerCase().trim().replace(/[.,!?;:()\[\]{}\"\'“”‘’]/g, '').replace(/\s+/g, ' ').trim();
             }
 
-            // Fix block's fuzzyMatch — exact for short/True-False/numeric, tolerance for longer
             function fuzzyMatch(userAnswer, correctAnswer) {
                 let u = userAnswer, c = correctAnswer;
                 if (/^[tf]$/i.test(c.trim())) {
@@ -1348,6 +1347,7 @@ random(Multiple Choice Examples)
             }
             subjectSelect.onchange = async () => {
                 try { await loadSubject(subjectSelect.value); } catch { alert('Could not load that subject.'); return; }
+                subjectSelect.blur();
                 resetGame();
             };
             function downloadJson() {
@@ -1394,7 +1394,7 @@ random(Multiple Choice Examples)
                     if (gameDiv.classList.contains('hidden') || maticMode) return;
                     if (e.ctrlKey || e.metaKey || e.altKey) return;
                     const tag = e.target.tagName;
-                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON') return;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'SELECT') return;
 
                     if (e.key === 'Enter') {
                         const q = currentTest && currentTest.questions[currentTest.currentIndex];
@@ -1411,7 +1411,7 @@ random(Multiple Choice Examples)
                 document.addEventListener('click', e => {
                     if (gameDiv.classList.contains('hidden') || maticMode) return;
                     const q = currentTest && currentTest.questions[currentTest.currentIndex];
-                    if (q && q.isTyped && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                    if (q && q.isTyped && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
                         setTimeout(() => answerInput.focus(), 50);
                     }
                 });
