@@ -1,4 +1,5 @@
 [
   {"name": "Sample Quiz", "file": "sample.json"},
-  {"name": "CTP 2nd Quarter", "file": "CTP quiz.json"}
+  {"name": "CTP 2nd Quarter", "file": "CTP quiz.json"},
+  {"name": "Math Memorize Exponents", "file": "Math-memorization-Exponents.json"}
 ]
