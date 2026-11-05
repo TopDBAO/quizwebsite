@@ -1,4 +1,5 @@
 [
   {"name": "Sample Quiz", "file": "sample.json"},
-  {"name": "Math Memorize Exponents", "file": "Math-memorization-Exponents.json"}
+  {"name": "Math Memorize Exponents", "file": "Math-memorization-Exponents.json"},
+  {"name": "1stSUMAP_3rdQ", "file": "1stSUMAP_3rdQ"}
 ]
