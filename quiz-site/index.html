@@ -2,200 +2,841 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Test - Auto Answer Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>BAOspace | Quiz Platform</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: #0b0f1c; color: #f0f0f0; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column; }
-        .game-panel, .edit-panel, .score-panel, .review-panel { background: #1f2639; border-radius: 32px; padding: 30px 25px; width: 95%; max-width: 750px; box-shadow: 0 25px 40px -10px #00000080; backdrop-filter: blur(2px); border: 1px solid #3e4a5f; margin: 10px auto; position: relative; }
-        h1, h2 { margin-top: 0; font-weight: 400; letter-spacing: -0.5px; border-left: 5px solid #5f9ea0; padding-left: 20px; }
-        h1 { font-size: 2.2rem; } h2 { font-size: 1.8rem; }
-        .question-display { background: #2b3348; padding: 25px 20px; border-radius: 40px; font-size: 1.6rem; font-weight: 600; margin: 20px 0; word-break: break-word; box-shadow: inset 0 0 0 1px #4b5670; text-align: center; }
-        .question-display img { max-width: 100%; max-height: 350px; border-radius: 20px; margin: 10px 0; border: 2px solid #5f9ea0; }
-        .options-container { background: #2b3348; border-radius: 30px; padding: 20px; margin: 15px 0; border: 2px solid #5f9ea0; max-height: 400px; overflow-y: auto; }
-        .option-item { background: #3c4b6a; padding: 15px 20px; margin: 10px 0; border-radius: 40px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 15px; text-align: left; }
-        .option-item:active { transform: scale(0.98); }
-        .option-item.selected { background: #5f9ea0; border-left: 5px solid #ffb86b; }
-        .option-item.correct-highlight { background: #2e8b57 !important; border-left: 5px solid #a0ffa0; }
-        .option-item.wrong-highlight { background: #ff6b6b !important; border-left: 5px solid #ff0000; }
-        .option-prefix { font-weight: bold; color: #ffb86b; font-size: 1rem; min-width: 70px; text-align: left; }
-        .option-text { flex: 1; text-align: left; }
-        .option-key-hint { color: #5f9ea0; font-size: 0.8rem; margin-left: 5px; opacity: 0.6; font-weight: bold; }
-        input[type="text"] { width: 100%; }
-        input, textarea, button { background: #2b3348; border: 2px solid #414e6b; color: white; font-size: 1.2rem; padding: 15px 20px; border-radius: 60px; width: 100%; margin: 8px 0; transition: 0.2s; outline: none; }
-        input:focus { border-color: #5f9ea0; box-shadow: 0 0 10px rgba(95, 158, 160, 0.3); }
-        textarea { border-radius: 30px; resize: vertical; min-height: 400px; font-family: 'Fira Code', monospace; line-height: 1.6; background: #1a1f2e; border-color: #3d4b66; font-size: 0.9rem; }
-        button { background: #3c4b6a; border: none; font-weight: 600; cursor: pointer; width: auto; min-width: 200px; padding: 15px 30px; margin: 10px 10px 10px 0; border-radius: 40px; box-shadow: 0 8px 0 #1f2537; transition: all 0.2s; }
-        button:active { transform: translateY(2px); box-shadow: 0 4px 0 #1f2537; }
-        button.small { background: #2f3b52; font-size: 1rem; padding: 12px 20px; min-width: 120px; }
-        button.save-as-btn { background: #2e8b57; box-shadow: 0 8px 0 #1e5a3a; }
-        button.auto-save-btn { background: #ffb86b; color: #0b0f1c; box-shadow: 0 8px 0 #b86f2c; }
-        #submitBtn.correct-feedback { background: #2e8b57 !important; box-shadow: 0 8px 0 #1e5a3a; }
-        #submitBtn.wrong-feedback { background: #ff6b6b !important; box-shadow: 0 8px 0 #b84545; }
-        #submitBtn.typo-feedback { background: #ffb86b !important; color: #0b0f1c !important; box-shadow: 0 8px 0 #b86f2c; }
-        .matic-button { background: #ffb86b; color: #0b0f1c; font-size: 1.4rem; font-weight: bold; padding: 18px 25px; min-width: 250px; box-shadow: 0 6px 0 #b86f2c; margin: 15px auto; border-radius: 60px; display: block; width: 100%; text-align: center; }
-        .matic-button.active { background: #2e8b57; color: white; box-shadow: 0 6px 0 #1e5a3a; }
-        .tts-button { background: #6c5b7b; color: white; font-size: 1.4rem; font-weight: bold; padding: 18px 25px; min-width: 250px; box-shadow: 0 6px 0 #3d2e4a; margin: 10px auto; border-radius: 60px; display: block; width: 100%; text-align: center; }
-        .tts-button.active { background: #5f9ea0; color: white; box-shadow: 0 6px 0 #3d6b6d; }
-        .tts-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 6px 0 #3d2e4a; }
-        .hidden { display: none !important; }
-        .flex-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-        .review-item { background: #252e40; padding: 20px; border-radius: 30px; margin-bottom: 15px; border-left: 10px solid; text-align: left; }
-        .review-item.correct { border-left-color: #2ecc71; }
-        .review-item.incorrect { border-left-color: #e74c3c; }
-        .score-number { font-size: 3.5rem; font-weight: 800; background: linear-gradient(145deg, #b3f0ff, #6c9eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .edit-icon { position: fixed; top: 20px; right: 25px; background: #242c3f; border: none; font-size: 2rem; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; box-shadow: 0 5px 15px black; z-index: 999; display: flex; align-items: center; justify-content: center; }
-        .progress-indicator { margin-top: 15px; color: #8a9bc0; font-size: 1rem; }
-        .timer-display { background: #2b3348; color: #5f9ea0; padding: 10px 20px; border-radius: 50px; display: inline-block; margin-bottom: 15px; font-size: 1.3rem; font-weight: bold; border: 1px solid #5f9ea0; }
-        .timer-display.timer-warning { color: #ff6b6b !important; border-color: #ff6b6b !important; animation: pulse 0.5s infinite; }
-        .stats-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .test-indicator { background: #3c4b6a; padding: 8px 20px; border-radius: 30px; font-size: 1rem; color: #ffffff; margin-top: 10px; display: inline-block; font-weight: bold; border-left: 5px solid #5f9ea0; }
-        .test-progress { background: #2b3348; padding: 5px 15px; border-radius: 30px; font-size: 0.9rem; color: #5f9ea0; margin-left: 10px; display: inline-block; }
-        .test-mode-badge { background: #5f9ea0; color: #0b0f1c; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; display: inline-block; }
-        .error-message { color: #ff6b6b; font-size: 1rem; margin-top: 5px; display: none; }
-        .error-message.visible { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-        .save-notification { background: #2e8b57; color: white; padding: 10px 20px; border-radius: 30px; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; animation: slideUp 0.3s, fadeOut 0.3s 2.7s; opacity: 0; pointer-events: none; }
-        @keyframes slideUp { from { bottom: 0; opacity: 0; } to { bottom: 20px; opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        .removed-info { background: #4a2c2c; border-left: 5px solid #ff6b6b; padding: 12px; margin: 10px 0; border-radius: 20px; font-size: 0.95rem; color: #ff9999; }
-        .dropdown-container { margin-bottom: 20px; position: relative; }
-        .dropdown-header { background: #3c4b6a; padding: 12px 20px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-left: 5px solid #5f9ea0; }
-        .dropdown-header .arrow { font-size: 1.2rem; transition: transform 0.3s; }
-        .dropdown-header.open .arrow { transform: rotate(180deg); }
-        .dropdown-content { background: #2b3348; border-radius: 20px; padding: 20px; margin-top: 10px; border: 1px solid #5f9ea0; display: none; }
-        .dropdown-content.show { display: block; }
-        .instruction-section { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #414e6b; }
-        .instruction-section:last-child { border-bottom: none; }
-        .instruction-title { color: #5f9ea0; font-weight: bold; margin-bottom: 8px; font-size: 1.1rem; }
-        .instruction-item { margin: 8px 0; padding-left: 15px; color: #a9c9ff; }
-        .auto-save-status { font-size: 0.8rem; color: #8a9bc0; margin-left: 10px; }
-        .latex-preview { background: #2b3348; border-radius: 20px; padding: 15px; margin: 15px 0 10px 0; border-left: 5px solid #5f9ea0; }
-        .latex-preview-title { font-size: 0.9rem; color: #5f9ea0; margin-bottom: 10px; font-weight: bold; }
-        .preview-content { font-family: 'Segoe UI', Roboto, system-ui, sans-serif; line-height: 1.6; }
-        .preview-line { margin: 8px 0; padding: 5px; border-radius: 12px; background: #1a1f2e; word-break: break-word; }
-        .matic-status { text-align: center; padding: 12px; background: #2b3348; border-radius: 30px; margin: 10px 0; color: #ffb86b; font-weight: bold; animation: pulse 1s infinite; }
-        .tts-status { text-align: center; padding: 12px; background: #6c5b7b; border-radius: 30px; margin: 10px 0; color: white; font-weight: bold; }
-        .timer-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; background: #2b3348; padding: 10px; border-radius: 60px; }
-        .timer-control label { font-size: 1rem; color: #ffb86b; }
-        .timer-control input { width: 70px; padding: 8px; margin: 0; text-align: center; font-size: 1rem; }
-        .feedback-box { background: #2e8b57; color: white; padding: 12px 20px; border-radius: 30px; margin: 10px 0; text-align: center; font-size: 1.1rem; font-weight: bold; border-left: 5px solid #a0ffa0; }
-        .feedback-box.wrong { background: #ff6b6b; border-left: 5px solid #ff0000; }
-        .feedback-box.typo { background: #ffb86b; color: #0b0f1c; border-left: 5px solid #ffa500; }
-        .feedback-box .highlight-gold { color: #ffd700; font-weight: bold; background: rgba(255, 215, 0, 0.2); padding: 2px 4px; border-radius: 4px; }
-        .continue-btn { background: #5f9ea0; color: #0b0f1c; min-width: 150px; margin: 5px auto; padding: 10px 20px; font-size: 1rem; }
-        .keyboard-hint { color: #5f9ea0; font-size: 0.85rem; text-align: center; margin-top: 5px; opacity: 0.7; }
-        .tts-pause-input { width: 70px; padding: 8px; margin: 0; text-align: center; font-size: 1rem; }
-        .speech-rate-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; background: #2b3348; padding: 10px; border-radius: 60px; }
-        .speech-rate-control label { font-size: 1rem; color: #ffb86b; }
-        .speech-rate-control input[type="range"] { width: 150px; margin: 0; padding: 0; accent-color: #5f9ea0; background: transparent; }
-        .speech-rate-control span { color: #ffb86b; font-weight: bold; min-width: 40px; }
-        .tts-controls { margin: 10px 0; padding: 15px; background: #2b3348; border-radius: 30px; border-left: 5px solid #6c5b7b; }
-        .tts-controls.disabled { opacity: 0.4; pointer-events: none; }
-        .voice-lang-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0; background: #2b3348; padding: 10px; border-radius: 60px; }
-        .voice-lang-control label { font-size: 1rem; color: #ffb86b; }
-        .voice-lang-toggle { display: inline-flex; border-radius: 40px; overflow: hidden; border: 2px solid #414e6b; }
-        .voice-lang-toggle button { min-width: 70px; width: auto; padding: 8px 18px; margin: 0; border-radius: 0; font-size: 1rem; font-weight: 700; box-shadow: none; background: #2b3348; color: #8a9bc0; }
-        .voice-lang-toggle button.active { background: #5f9ea0; color: white; }
-        .voice-lang-toggle button:active { transform: none; box-shadow: none; }
-        .voice-warning { font-size: 0.85rem; color: #ffb86b; text-align: center; margin-top: 6px; display: none; }
-        .voice-warning.visible { display: block; }
-        .subject-select{position:fixed;top:20px;left:20px;z-index:999;width:auto;max-width:55vw;padding:10px 16px;margin:0;font-size:1rem;border-radius:40px;background:#242c3f;color:#fff;border:2px solid #414e6b;}
-    </style>
+<style>
+    :root {
+        color-scheme: dark;
+        --bg: #0b1120;
+        --surface: #111c2f;
+        --surface-raised: #17243a;
+        --surface-soft: #1d2b42;
+        --border: #2b3a52;
+        --border-strong: #3b4d68;
+        --text: #edf3fb;
+        --muted: #9aabc2;
+        --subtle: #71839d;
+        --accent: #60a5fa;
+        --accent-strong: #3b82f6;
+        --accent-soft: rgba(96, 165, 250, .13);
+        --success: #22c55e;
+        --success-soft: rgba(34, 197, 94, .13);
+        --danger: #f87171;
+        --danger-soft: rgba(248, 113, 113, .13);
+        --warning: #fbbf24;
+        --warning-soft: rgba(251, 191, 36, .13);
+        --radius-xl: 20px;
+        --radius-lg: 15px;
+        --radius-md: 11px;
+        --radius-sm: 8px;
+        --shadow: 0 16px 40px rgba(0, 0, 0, .22);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; scroll-behavior: smooth; }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+    }
+    .skip-link {
+        position: absolute; left: 12px; top: -50px; z-index: 2000;
+        background: var(--accent); color: #08111f; padding: 9px 13px; border-radius: var(--radius-sm);
+    }
+    .skip-link:focus { top: 12px; }
+    .app-shell {
+        width: min(1500px, 100%);
+        min-height: 100vh;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 248px minmax(0, 1fr);
+    }
+    .sidebar {
+        min-height: 100vh;
+        padding: 27px 18px 20px;
+        background: #0e1829;
+        border-right: 1px solid rgba(148, 163, 184, .13);
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
+    .brand-mark {
+        width: 42px; height: 42px; flex: 0 0 42px;
+        display: grid; place-items: center;
+        background: linear-gradient(145deg, #3b82f6, #2563eb);
+        color: white; border-radius: 13px;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, .24);
+    }
+    .brand-name { display: block; font-size: 15px; font-weight: 750; letter-spacing: .01em; }
+    .brand-caption { display: block; margin-top: 1px; color: var(--subtle); font-size: 10px; font-weight: 700; letter-spacing: .14em; }
+    .sidebar-group { display: grid; gap: 9px; }
+    .sidebar-label { padding: 0 11px; color: #71839d; font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+    .sidebar-nav { display: grid; gap: 6px; }
+    .nav-item {
+        width: 100%; min-height: 44px; padding: 10px 12px; margin: 0;
+        display: flex; align-items: center; gap: 12px;
+        border: 1px solid transparent; border-radius: var(--radius-md);
+        background: transparent; color: #aab9ce;
+        box-shadow: none; text-align: left; font-size: 13px; font-weight: 600;
+        cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease;
+    }
+    .nav-item:hover { background: rgba(148, 163, 184, .08); color: var(--text); }
+    .nav-item.active { color: #dcecff; background: var(--accent-soft); border-color: rgba(96, 165, 250, .18); }
+    .nav-item.active .nav-icon { color: var(--accent); }
+    .nav-icon { width: 18px; height: 18px; flex: 0 0 18px; color: #91a3bc; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-note {
+        padding: 15px 14px; border-radius: var(--radius-lg);
+        border: 1px solid rgba(96, 165, 250, .16);
+        background: linear-gradient(145deg, rgba(30, 64, 115, .25), rgba(23, 36, 58, .65));
+    }
+    .sidebar-note-title { color: #dbeafe; font-size: 12px; font-weight: 700; }
+    .sidebar-note p { color: var(--muted); font-size: 11px; margin: 5px 0 0; line-height: 1.5; }
+    .sidebar-footer { padding: 0 10px; color: #667993; font-size: 10px; }
+
+    .app-main { min-width: 0; padding: 0 38px 48px; }
+    .topbar {
+        min-height: 94px; display: flex; align-items: center; justify-content: space-between;
+        gap: 20px; border-bottom: 1px solid rgba(148, 163, 184, .12); margin-bottom: 34px;
+    }
+    .topbar-heading { min-width: 0; }
+    .topbar-kicker { margin: 0 0 2px; color: var(--subtle); font-size: 10px; font-weight: 750; letter-spacing: .15em; }
+    .topbar-title { margin: 0; font-size: 23px; line-height: 1.2; font-weight: 700; letter-spacing: -.035em; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .subject-control { display: grid; gap: 3px; min-width: 165px; }
+    .subject-control label { color: var(--subtle); font-size: 9px; font-weight: 750; letter-spacing: .12em; }
+    .subject-select {
+        width: 100%; max-width: 260px; min-height: 40px; margin: 0; padding: 8px 34px 8px 12px;
+        color: var(--text); background: var(--surface-raised); border: 1px solid var(--border);
+        border-radius: var(--radius-md); font-size: 13px; cursor: pointer;
+    }
+    .icon-button {
+        width: 40px; height: 40px; padding: 0; margin: 0; min-width: 40px;
+        display: grid; place-items: center; border-radius: var(--radius-md);
+        background: var(--surface-raised); color: var(--muted); border: 1px solid var(--border);
+        box-shadow: none; cursor: pointer;
+    }
+    .icon-button:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-soft); }
+    .content-area { width: 100%; max-width: 1050px; margin: 0 auto; }
+
+    .game-panel, .edit-panel, .score-panel, .review-panel {
+        width: 100%; max-width: 860px; margin: 0 auto;
+        padding: 30px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: var(--radius-xl);
+        box-shadow: var(--shadow); position: relative;
+    }
+    h1, h2, h3 { color: var(--text); }
+    .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+    .panel-heading h1, .panel-heading h2 { margin: 2px 0 0; border: 0; padding: 0; font-size: 25px; line-height: 1.25; font-weight: 720; letter-spacing: -.035em; }
+    .section-kicker { margin: 0; color: var(--subtle); font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+    .session-chip { padding: 6px 10px; color: #bfdbfe; background: var(--accent-soft); border: 1px solid rgba(96, 165, 250, .2); border-radius: 8px; font-size: 11px; font-weight: 650; white-space: nowrap; }
+    .stats-container { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 21px; flex-wrap: wrap; }
+    .timer-display {
+        display: inline-flex; align-items: center; min-height: 36px; padding: 7px 12px;
+        color: #d4e8ff; background: var(--accent-soft); border: 1px solid rgba(96, 165, 250, .2);
+        border-radius: 9px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+    }
+    .timer-display.timer-warning { color: #fecaca !important; background: var(--danger-soft); border-color: rgba(248, 113, 113, .45) !important; animation: pulse 1s ease-in-out infinite; }
+    .progress-indicator { margin: 0; color: var(--muted); font-size: 12px; }
+    .question-display {
+        min-height: 145px; display: flex; flex-direction: column; justify-content: center;
+        margin: 0 0 18px; padding: 30px 28px;
+        color: #f4f7fc; background: var(--surface-raised);
+        border: 1px solid var(--border); border-radius: var(--radius-lg);
+        font-size: clamp(20px, 2.4vw, 25px); line-height: 1.45; font-weight: 650;
+        text-align: left; overflow-wrap: anywhere;
+    }
+    .question-display img { display: block; max-width: 100%; max-height: 350px; object-fit: contain; border-radius: 10px; margin: 16px auto 0; border: 1px solid var(--border-strong); }
+    .options-container { display: grid; gap: 10px; margin: 0 0 18px; max-height: 440px; overflow-y: auto; }
+    .option-item {
+        min-height: 58px; display: flex; align-items: center; gap: 14px;
+        margin: 0; padding: 12px 16px; color: #dce6f3;
+        background: #152238; border: 1px solid var(--border); border-radius: 12px;
+        cursor: pointer; text-align: left; transition: border-color .17s ease, background .17s ease, transform .17s ease;
+    }
+    .option-item:hover { background: #1b2c46; border-color: #4b6382; }
+    .option-item:active { transform: scale(.995); }
+    .option-item.selected { background: var(--accent-soft); border-color: var(--accent); }
+    .option-prefix { width: 30px; height: 30px; min-width: 30px; display: grid; place-items: center; color: #b9d9ff; background: #243a58; border-radius: 8px; font-size: 12px; font-weight: 750; text-align: center; }
+    .option-text { flex: 1; min-width: 0; text-align: left; font-size: 14px; }
+    .option-key-hint { color: #7286a2; font-size: 10px; opacity: .9; font-weight: 650; }
+    .option-item.correct-highlight { background: var(--success-soft) !important; border: 1px solid rgba(34, 197, 94, .6) !important; }
+    .option-item.correct-highlight .option-prefix { color: #bbf7d0; background: rgba(34, 197, 94, .2); }
+    .option-item.wrong-highlight { background: var(--danger-soft) !important; border: 1px solid rgba(248, 113, 113, .65) !important; }
+    .option-item.wrong-highlight .option-prefix { color: #fecaca; background: rgba(248, 113, 113, .18); }
+    .quiz-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 17px; }
+    .test-indicator { display: grid; gap: 2px; min-width: 0; color: #dce8f7; font-size: 12px; font-weight: 650; }
+    .test-indicator-meta { color: var(--subtle); font-size: 10px; font-weight: 500; }
+    .test-progress { color: #9eb6d4; font-size: 11px; white-space: nowrap; }
+    .test-mode-badge { display: inline-flex; padding: 3px 8px; border-radius: 6px; background: var(--accent-soft); color: #c6e0ff; font-size: 10px; font-weight: 700; }
+    .flex-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+    input, textarea {
+        width: 100%; min-width: 0; margin: 0; padding: 13px 15px;
+        color: var(--text); background: #0e192b; border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md); font-size: 14px; transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    input::placeholder, textarea::placeholder { color: #71839d; }
+    input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(96, 165, 250, .12); outline: none; }
+    input[type="text"] { width: 100%; }
+    input[type="number"] { width: 90px; }
+    input[type="range"] { padding: 0; accent-color: var(--accent); }
+    button {
+        width: auto; min-width: 0; min-height: 42px; margin: 0; padding: 10px 16px;
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        color: #dce8f7; background: var(--surface-soft); border: 1px solid var(--border-strong);
+        border-radius: 10px; box-shadow: none; font-size: 13px; font-weight: 650;
+        cursor: pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease, opacity .18s ease;
+    }
+    button:hover:not(:disabled) { background: #263a56; border-color: #526b8d; }
+    button:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+    button:disabled { opacity: .42; cursor: not-allowed; }
+    #submitBtn { width: 100%; min-height: 48px; margin-top: 12px; color: #071426; background: var(--accent); border-color: var(--accent); font-size: 14px; font-weight: 750; }
+    .primary-button { min-height: 44px; color: #071426; background: var(--accent); border-color: var(--accent); font-size: 13px; font-weight: 750; }
+    #submitBtn:hover:not(:disabled), .primary-button:hover:not(:disabled) { color: #06101e; background: #83bcff; border-color: #83bcff; }
+    #submitBtn.correct-feedback { color: #052012 !important; background: var(--success) !important; border-color: var(--success) !important; }
+    #submitBtn.wrong-feedback { color: #2a0808 !important; background: var(--danger) !important; border-color: var(--danger) !important; }
+    #submitBtn.typo-feedback { color: #241704 !important; background: var(--warning) !important; border-color: var(--warning) !important; }
+    button.small { min-height: 38px; padding: 8px 12px; font-size: 12px; }
+    button.save-as-btn { color: #bbf7d0; background: var(--success-soft); border-color: rgba(34, 197, 94, .28); }
+    button.save-as-btn:hover { background: rgba(34, 197, 94, .2); }
+    button.auto-save-btn { color: #071426; background: var(--accent); border-color: var(--accent); }
+    .matic-button, .tts-button { min-height: 42px; padding: 10px 14px; font-size: 12px; }
+    .matic-button { color: #081426; background: #93c5fd; border-color: #93c5fd; }
+    .matic-button:hover:not(:disabled) { background: #bfdbfe; }
+    .matic-button.active { color: #052012; background: #4ade80; border-color: #4ade80; }
+    .tts-button { color: #d8e9ff; background: #263c59; border-color: #405c7e; }
+    .tts-button.active { color: #dbeafe; background: #1e497c; border-color: #60a5fa; }
+    .continue-btn { min-height: 38px; padding: 8px 14px; color: #dbeafe; background: #24456c; border-color: #456b9a; font-size: 12px; }
+    .quiz-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 19px; padding-top: 17px; border-top: 1px solid rgba(148, 163, 184, .14); }
+    .keyboard-hint { margin: 12px 0 0; color: #778ba6; text-align: center; font-size: 11px; }
+    .error-message { display: none; margin: 8px 0 0; color: #fca5a5; font-size: 12px; }
+    .error-message.visible { display: block; animation: fadeIn .2s ease; }
+    .feedback-box { margin: 13px 0 0; padding: 13px 15px; color: #bbf7d0; background: var(--success-soft); border: 1px solid rgba(34, 197, 94, .32); border-radius: 11px; font-size: 13px; font-weight: 650; text-align: left; }
+    .feedback-box.wrong { color: #fecaca; background: var(--danger-soft); border-color: rgba(248, 113, 113, .35); }
+    .feedback-box.typo { color: #fde68a; background: var(--warning-soft); border-color: rgba(251, 191, 36, .35); }
+    .feedback-box .highlight-gold { color: #fde68a; background: rgba(251, 191, 36, .15); padding: 1px 3px; border-radius: 3px; }
+    .matic-status, .tts-status { margin-top: 12px; padding: 11px 13px; border-radius: 10px; font-size: 12px; font-weight: 650; text-align: center; }
+    .matic-status { color: #cfe4ff; background: var(--accent-soft); border: 1px solid rgba(96, 165, 250, .2); }
+    .tts-status { color: #dbeafe; background: #1d3553; border: 1px solid #355477; }
+    .settings-drawer { margin-top: 22px; border: 1px solid var(--border); border-radius: 13px; background: rgba(14, 25, 43, .58); overflow: hidden; }
+    .settings-drawer > summary { min-height: 50px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; color: #dce8f7; font-size: 12px; font-weight: 700; cursor: pointer; list-style: none; }
+    .settings-drawer > summary::-webkit-details-marker { display: none; }
+    .settings-drawer > summary::after { content: "+"; color: var(--accent); font-size: 19px; font-weight: 400; }
+    .settings-drawer[open] > summary::after { content: "−"; }
+    .settings-inner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0 14px 14px; }
+    .timer-control, .speech-rate-control, .voice-lang-control {
+        min-width: 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+        margin: 0; padding: 13px; border: 1px solid var(--border); border-radius: 10px; background: #142238;
+    }
+    .timer-control label, .speech-rate-control label, .voice-lang-control label { color: #b8c8dc; font-size: 11px; font-weight: 600; }
+    .timer-control span { color: var(--muted); font-size: 11px; }
+    .timer-control input, .tts-pause-input { width: 76px; padding: 7px 9px; text-align: center; font-size: 12px; }
+    .tts-controls { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 12px; background: #142238; border: 1px solid var(--border); border-radius: 11px; }
+    .tts-controls.disabled { opacity: .42; pointer-events: none; }
+    .voice-lang-control, .speech-rate-control { padding: 0; border: 0; background: transparent; }
+    .voice-lang-toggle { display: inline-flex; overflow: hidden; border: 1px solid var(--border-strong); border-radius: 8px; }
+    .voice-lang-toggle button { min-height: 30px; padding: 5px 10px; border: 0; border-radius: 0; background: transparent; color: var(--muted); box-shadow: none; font-size: 10px; }
+    .voice-lang-toggle button.active { background: var(--accent); color: #071426; }
+    .voice-lang-toggle button:active { transform: none; }
+    .voice-warning { display: none; grid-column: 1 / -1; color: #fcd34d; font-size: 11px; text-align: left; }
+    .voice-warning.visible { display: block; }
+    .speech-rate-control input[type="range"] { width: min(100px, 42%); margin: 0; }
+    .speech-rate-control span { min-width: 32px; color: #bfdbfe; font-size: 11px; font-weight: 700; }
+    .auto-save-status { margin: 12px 0 0; color: var(--muted); font-size: 11px; }
+
+    /* Editor workspace */
+    .editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+    .editor-heading h2, .score-panel h2, .review-panel h2 { margin: 2px 0 0; padding: 0; border: 0; font-size: 23px; font-weight: 720; letter-spacing: -.03em; }
+    .editor-intro { margin: 8px 0 0; max-width: 650px; color: var(--muted); font-size: 12px; }
+    .editor-info { margin: 0 0 16px; padding: 13px 15px; color: #b8c8dc; background: #142238; border: 1px solid var(--border); border-radius: 11px; font-size: 11px; line-height: 1.7; }
+    .editor-info strong { color: #e2edfb; }
+    .dropdown-container { margin: 0 0 17px; }
+    .dropdown-header { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; color: #c7d7e9; background: #142238; border: 1px solid var(--border); border-radius: 10px; font-size: 12px; font-weight: 650; cursor: pointer; }
+    .dropdown-header .arrow { color: var(--accent); font-size: 14px; transition: transform .2s ease; }
+    .dropdown-header.open .arrow { transform: rotate(180deg); }
+    .dropdown-content { display: none; margin-top: 8px; padding: 15px; background: #101d30; border: 1px solid var(--border); border-radius: 10px; }
+    .dropdown-content.show { display: block; }
+    .instruction-section { margin: 0 0 13px; padding: 0 0 13px; border-bottom: 1px solid rgba(148, 163, 184, .13); }
+    .instruction-section:last-child { margin: 0; padding: 0; border: 0; }
+    .instruction-title { margin-bottom: 5px; color: #bfdbfe; font-size: 12px; font-weight: 700; }
+    .instruction-item { margin: 5px 0; padding-left: 10px; color: var(--muted); font-size: 11px; }
+    .editor-workspace { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 14px; align-items: stretch; }
+    .editor-pane, .preview-pane { min-width: 0; padding: 13px; background: #101d30; border: 1px solid var(--border); border-radius: 12px; }
+    .pane-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; color: #dce8f7; font-size: 12px; font-weight: 700; }
+    .pane-caption { color: var(--subtle); font-size: 10px; font-weight: 500; }
+    textarea { display: block; min-height: 520px; resize: vertical; border-radius: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.65; background: #0b1525; border-color: #2a3b55; }
+    .latex-preview { min-height: 520px; margin: 0; padding: 13px; background: #0b1525; border: 1px solid #2a3b55; border-radius: 9px; overflow-wrap: anywhere; }
+    .latex-preview-title { display: none; }
+    .preview-content { color: #d4e0ef; font-size: 12px; line-height: 1.7; }
+    .preview-line { margin: 0 0 9px; padding: 9px 10px; background: #142238; border: 1px solid rgba(148, 163, 184, .1); border-radius: 8px; overflow-wrap: anywhere; }
+    .editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 16px; }
+    .editor-actions .auto-save-btn { margin-right: auto; }
+
+    /* Results and answer review */
+    .score-panel, .review-panel { text-align: left; }
+    .results-header { margin-bottom: 22px; }
+    .results-header h2 { margin: 2px 0 0; font-size: 23px; }
+    .score-summary { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 14px; margin-bottom: 18px; }
+    .score-main { display: flex; flex-direction: column; justify-content: center; padding: 22px; background: linear-gradient(145deg, rgba(37, 99, 235, .18), rgba(23, 36, 58, .6)); border: 1px solid rgba(96, 165, 250, .2); border-radius: 14px; }
+    .score-label { color: #a9c8ee; font-size: 10px; font-weight: 750; letter-spacing: .13em; }
+    .score-number { margin-top: 6px; color: #eff6ff; font-size: clamp(42px, 6vw, 58px); line-height: 1.1; font-weight: 800; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+    .results-stats { display: grid; grid-template-columns: 1fr; gap: 9px; }
+    .results-stat { margin: 0; padding: 13px 15px; color: #dce8f7; background: #142238; border: 1px solid var(--border); border-radius: 10px; font-size: 12px !important; }
+    .results-stat-label { display: block; margin-bottom: 2px; color: var(--subtle); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .flex-row.results-actions { gap: 10px; }
+    .review-item { margin: 0 0 12px; padding: 16px; background: #142238; border: 1px solid var(--border); border-left: 3px solid var(--border-strong); border-radius: 11px; text-align: left; }
+    .review-item.correct { border-left-color: var(--success); }
+    .review-item.incorrect { border-left-color: var(--danger); }
+    .review-question { margin: 0 0 12px; color: #eff6ff; font-size: 14px; line-height: 1.5; }
+    .review-item p:not(.review-question) { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin: 7px 0; color: #cfdaea; font-size: 12px; }
+    .review-label { min-width: 105px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .review-meta { padding-top: 8px; border-top: 1px solid rgba(148, 163, 184, .12); color: var(--subtle) !important; font-size: 10px !important; }
+
+    .save-notification { position: fixed; left: 50%; bottom: 22px; z-index: 1000; transform: translateX(-50%); padding: 11px 16px; color: #dcfce7; background: #14532d; border: 1px solid rgba(34, 197, 94, .3); border-radius: 10px; box-shadow: var(--shadow); font-size: 12px; font-weight: 650; opacity: 0; pointer-events: none; animation: slideUp .25s ease, fadeOut .25s 2.7s forwards; }
+    .hidden { display: none !important; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .72; } }
+    @keyframes slideUp { from { bottom: 8px; opacity: 0; } to { bottom: 22px; opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; } }
+
+    /* Focus mode: use the entire browser viewport for the question and answer controls. */
+    body.focus-mode {
+        min-height: 100dvh;
+        overflow-x: hidden;
+        background: #080f1d;
+    }
+    body.focus-mode .sidebar,
+    body.focus-mode .topbar { display: none !important; }
+    body.focus-mode .app-shell {
+        display: block;
+        width: 100%; max-width: none;
+        min-height: 100dvh;
+    }
+    body.focus-mode .app-main {
+        width: 100%; min-width: 0;
+        min-height: 100dvh; height: auto;
+        padding: 0;
+    }
+    body.focus-mode .content-area {
+        display: flex;
+        width: 100%; max-width: none;
+        min-height: 100dvh;
+        margin: 0;
+    }
+    body.focus-mode #gameContainer {
+        display: flex;
+        flex: 1 0 auto;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        gap: clamp(14px, 2.1vh, 24px);
+        width: 100%; max-width: none;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 82px clamp(28px, 5vw, 96px) clamp(26px, 4vh, 48px);
+        overflow: visible;
+        background:
+            radial-gradient(ellipse at 50% 5%, rgba(59, 130, 246, .11), transparent 50%),
+            #080f1d;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    body.focus-mode #gameContainer > .panel-heading,
+    body.focus-mode #gameContainer > .stats-container,
+    body.focus-mode #gameContainer > .quiz-meta,
+    body.focus-mode #gameContainer > .keyboard-hint { display: none !important; }
+    body.focus-mode #gameContainer > .question-display,
+    body.focus-mode #gameContainer > .options-container,
+    body.focus-mode #gameContainer > .quiz-actions,
+    body.focus-mode #gameContainer > .settings-drawer,
+    body.focus-mode #gameContainer > .flex-row,
+    body.focus-mode #gameContainer > .error-message,
+    body.focus-mode #gameContainer > .feedback-box,
+    body.focus-mode #gameContainer > .matic-status,
+    body.focus-mode #gameContainer > .tts-status,
+    body.focus-mode #gameContainer > #typoContinueContainer {
+        width: 100%;
+        max-width: 1600px;
+        align-self: center;
+    }
+    body.focus-mode .question-display {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        min-height: clamp(250px, 36vh, 420px);
+        margin: 0;
+        padding: clamp(34px, 4.5vw, 76px);
+        border-radius: 24px;
+        background: linear-gradient(145deg, #172943, #122139);
+        border-color: #344b69;
+        box-shadow: 0 18px 55px rgba(0, 0, 0, .2);
+        font-size: clamp(30px, 3.3vw, 48px);
+        line-height: 1.35;
+        text-align: center;
+    }
+    body.focus-mode .question-display img { max-height: 34vh; }
+    body.focus-mode .options-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        max-height: none;
+        margin: 0;
+        overflow: visible;
+    }
+    body.focus-mode .option-item {
+        min-height: clamp(86px, 10vh, 120px);
+        padding: 18px 22px;
+        gap: 18px;
+        border-radius: 16px;
+        background: #14243b;
+        border-color: #344a67;
+        touch-action: manipulation;
+    }
+    body.focus-mode .option-prefix {
+        width: 44px; min-width: 44px; height: 44px;
+        border-radius: 11px;
+        font-size: 16px;
+    }
+    body.focus-mode .option-text { font-size: clamp(18px, 1.6vw, 23px); line-height: 1.4; }
+    body.focus-mode .option-key-hint { font-size: 12px; }
+    body.focus-mode #answerInput {
+        min-height: 76px;
+        padding: 18px 22px;
+        font-size: 22px;
+        border-radius: 14px;
+    }
+    body.focus-mode #submitBtn {
+        min-height: 68px;
+        max-width: 1100px;
+        margin: 0 auto;
+        border-radius: 14px;
+        font-size: 19px;
+    }
+    body.focus-mode .quiz-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 14px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+    body.focus-mode .quiz-actions .matic-button,
+    body.focus-mode .quiz-actions .tts-button {
+        min-width: 210px;
+        min-height: 58px;
+        padding: 15px 24px;
+        border-radius: 13px;
+        font-size: 15px;
+    }
+    body.focus-mode #focusModeBtn {
+        position: fixed;
+        top: max(14px, env(safe-area-inset-top));
+        right: max(16px, env(safe-area-inset-right));
+        z-index: 1500;
+        min-height: 42px;
+        padding: 9px 13px;
+        margin: 0;
+        background: rgba(17, 28, 47, .94);
+        border-color: #405675;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, .25);
+        backdrop-filter: blur(10px);
+    }
+    body.focus-mode .settings-drawer {
+        margin: 0 auto;
+        border-color: #344a67;
+        background: rgba(17, 28, 47, .72);
+    }
+    body.focus-mode .settings-drawer > summary {
+        min-height: 58px;
+        padding: 15px 19px;
+        font-size: 14px;
+    }
+    body.focus-mode .settings-inner { gap: 13px; padding: 0 15px 15px; }
+    body.focus-mode .timer-control,
+    body.focus-mode .speech-rate-control,
+    body.focus-mode .voice-lang-control { min-height: 54px; }
+    body.focus-mode #maticAnswerDisplay {
+        width: 100%; max-width: 1600px;
+        align-self: center;
+        margin: 0;
+        padding: 20px 24px !important;
+        border-radius: 14px !important;
+        font-size: clamp(20px, 2vw, 28px) !important;
+    }
+    body.focus-mode .feedback-box,
+    body.focus-mode .matic-status,
+    body.focus-mode .tts-status { font-size: 15px; padding: 15px 18px; }
+
+    .focus-toggle {
+        color: #c9d9ed; background: transparent; border-color: var(--border-strong);
+    }
+    .focus-toggle:hover:not(:disabled) { color: var(--text); background: var(--surface-soft); }
+    .focus-toggle svg { width: 16px; height: 16px; }
+
+    @media (max-width: 1050px) {
+        .app-shell { grid-template-columns: 215px minmax(0, 1fr); }
+        .app-main { padding-left: 26px; padding-right: 26px; }
+        .game-panel, .edit-panel, .score-panel, .review-panel { padding: 24px; }
+        .editor-workspace { grid-template-columns: 1fr; }
+        textarea, .latex-preview { min-height: 340px; }
+    }
+    @media (max-width: 760px) {
+        .app-shell { display: flex; flex-direction: column; }
+        .sidebar { position: relative; top: auto; width: 100%; height: auto; min-height: 0; padding: 14px 18px 12px; border-right: 0; border-bottom: 1px solid rgba(148, 163, 184, .13); gap: 13px; }
+        .brand { padding: 0 2px; }
+        .brand-mark { width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px; }
+        .sidebar-group { gap: 7px; }
+        .sidebar-label, .sidebar-note, .sidebar-footer, .sidebar-spacer { display: none; }
+        .sidebar-nav { display: flex; gap: 7px; width: 100%; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+        .nav-item { width: auto; min-width: max-content; min-height: 38px; padding: 8px 12px; font-size: 12px; }
+        body.focus-mode .app-main { padding: 16px 12px 28px; }
+        body.focus-mode .content-area { max-width: 100%; }
+        body.focus-mode .game-panel { padding: 15px; border-radius: 0; }
+        body.focus-mode .question-display { min-height: 112px; margin-top: 4px; padding: 19px 15px; font-size: clamp(18px, 5vw, 22px); }
+        body.focus-mode .option-item { min-height: 52px; }
+        body.focus-mode .quiz-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        body.focus-mode #focusModeBtn { grid-column: 1 / -1; margin-left: 0; }
+        .app-main { padding: 0 16px 30px; }
+        .topbar { min-height: 80px; margin-bottom: 20px; gap: 10px; }
+        .topbar-title { font-size: 20px; }
+        .subject-control { min-width: 125px; }
+        .subject-select { max-width: 190px; font-size: 12px; }
+        .game-panel, .edit-panel, .score-panel, .review-panel { padding: 19px; border-radius: 16px; }
+        .panel-heading h1, .panel-heading h2 { font-size: 22px; }
+        .question-display { min-height: 125px; padding: 22px 18px; font-size: 20px; }
+        .option-item { min-height: 54px; padding: 10px 12px; }
+        .settings-inner { grid-template-columns: 1fr; }
+        .tts-controls { grid-template-columns: 1fr; }
+        .score-summary { grid-template-columns: 1fr; }
+        .score-main { min-height: 140px; }
+        .editor-actions .auto-save-btn { margin-right: 0; }
+    }
+    @media (max-width: 460px) {
+        .app-main { padding-left: 11px; padding-right: 11px; }
+        .topbar { align-items: flex-start; padding: 15px 0; flex-direction: column; }
+        .topbar-actions { width: 100%; justify-content: space-between; }
+        .subject-control { flex: 1; }
+        .subject-select { max-width: none; }
+        .game-panel, .edit-panel, .score-panel, .review-panel { padding: 15px; }
+        .stats-container { align-items: flex-start; }
+        .panel-heading { flex-direction: column; }
+        .session-chip { align-self: flex-start; }
+        .quiz-actions button { flex: 1 1 100%; }
+        body.focus-mode .quiz-actions { grid-template-columns: 1fr 1fr; }
+        body.focus-mode .quiz-actions button { width: 100%; }
+        body.focus-mode #focusModeBtn { grid-column: 1 / -1; }
+        .editor-actions button { flex: 1 1 auto; }
+    }
+    /* Mobile readability and touch targets, including the regular quiz view. */
+    @media (max-width: 760px) {
+        .question-display {
+            min-height: 150px;
+            padding: 23px 19px;
+            font-size: clamp(22px, 5.6vw, 28px);
+            line-height: 1.42;
+        }
+        .option-item {
+            min-height: 66px;
+            padding: 14px 15px;
+            gap: 13px;
+            touch-action: manipulation;
+        }
+        .option-prefix { width: 36px; min-width: 36px; height: 36px; font-size: 14px; }
+        .option-text { font-size: 16px; line-height: 1.45; }
+        #submitBtn { min-height: 58px; font-size: 16px; }
+        button { min-height: 48px; }
+        .settings-drawer > summary { min-height: 54px; }
+
+        body.focus-mode {
+            min-height: 100svh;
+            min-height: 100dvh;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+        }
+        body.focus-mode .app-main,
+        body.focus-mode .content-area { min-height: 100svh; min-height: 100dvh; height: auto; }
+        body.focus-mode #gameContainer {
+            min-height: 100svh;
+            min-height: 100dvh;
+            height: auto;
+            flex: none;
+            justify-content: flex-start;
+            gap: 15px;
+            padding: calc(70px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+        }
+        body.focus-mode .question-display {
+            min-height: clamp(180px, 27svh, 260px);
+            min-height: clamp(180px, 27dvh, 260px);
+            padding: 24px 21px;
+            border-radius: 17px;
+            font-size: clamp(25px, 6.4vw, 32px);
+            line-height: 1.38;
+            text-align: left;
+        }
+        body.focus-mode .question-display img { max-height: 25svh; max-height: 25dvh; }
+        body.focus-mode .options-container {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 11px;
+        }
+        body.focus-mode .option-item {
+            width: 100%;
+            min-height: 76px;
+            padding: 17px 17px;
+            gap: 14px;
+            border-radius: 14px;
+        }
+        body.focus-mode .option-prefix {
+            width: 42px; min-width: 42px; height: 42px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        body.focus-mode .option-text {
+            font-size: clamp(17px, 4.6vw, 20px);
+            line-height: 1.4;
+        }
+        body.focus-mode .option-key-hint { display: none; }
+        body.focus-mode #answerInput {
+            min-height: 70px;
+            padding: 17px 18px;
+            font-size: 19px;
+        }
+        body.focus-mode #submitBtn { min-height: 64px; font-size: 18px; }
+        body.focus-mode .quiz-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        body.focus-mode .quiz-actions .matic-button,
+        body.focus-mode .quiz-actions .tts-button {
+            width: 100%; min-width: 0;
+            min-height: 60px;
+            padding: 14px 10px;
+            font-size: 14px;
+        }
+        body.focus-mode #focusModeBtn {
+            top: max(9px, env(safe-area-inset-top));
+            right: max(10px, env(safe-area-inset-right));
+            min-height: 44px;
+            padding: 9px 12px;
+            font-size: 12px;
+        }
+        body.focus-mode .settings-drawer { width: 100%; }
+        body.focus-mode .settings-drawer > summary { min-height: 58px; font-size: 13px; }
+        body.focus-mode .settings-inner,
+        body.focus-mode .tts-controls { grid-template-columns: minmax(0, 1fr); }
+        body.focus-mode .timer-control,
+        body.focus-mode .speech-rate-control,
+        body.focus-mode .voice-lang-control {
+            min-height: 58px;
+            padding: 13px;
+            gap: 12px;
+        }
+        body.focus-mode .speech-rate-control input[type="range"] { width: min(155px, 42%); }
+    }
+
+    @media (max-width: 460px) {
+        .game-panel, .edit-panel, .score-panel, .review-panel { padding: 15px; }
+        .question-display { min-height: 155px; padding: 22px 17px; font-size: 23px; }
+        .option-item { min-height: 70px; padding: 14px; }
+        .option-text { font-size: 16px; }
+        body.focus-mode #gameContainer { padding-left: 12px; padding-right: 12px; }
+        body.focus-mode .question-display { min-height: 185px; padding: 22px 17px; font-size: clamp(24px, 6.5vw, 29px); }
+        body.focus-mode .option-item { min-height: 76px; padding: 16px 14px; }
+        body.focus-mode .option-text { font-size: 17px; }
+    }
+
+    /* Short landscape phones: keep controls large and allow natural vertical scrolling. */
+    @media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+        body.focus-mode #gameContainer { padding-top: 66px; }
+        body.focus-mode .question-display { min-height: 145px; font-size: 24px; }
+        body.focus-mode .option-item { min-height: 64px; }
+        body.focus-mode .option-prefix { width: 36px; min-width: 36px; height: 36px; }
+    }
+
+    .option-item:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+</style>
 </head>
 <body>
-    <button class="edit-icon" onclick="toggleEditor()">⚙️</button>
-    <select id="subjectSelect" class="subject-select"></select>
-
-    <audio id="correctSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
-    <audio id="incorrectSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
-
-    <div id="gameContainer" class="game-panel">
-        <h1>Test</h1>
-        <div class="stats-container">
-            <div id="timerDisplay" class="timer-display">⏱️ 0:00</div>
-            <div id="progressDisplay" class="progress-indicator">📊 0/0 answered</div>
-        </div>
-        <div class="question-display" id="questionText">Loading...</div>
-        <div id="optionsContainer" class="options-container hidden"></div>
-        <div>
-            <span id="testIndicator" class="test-indicator"></span>
-            <span id="testProgress" class="test-progress"></span>
-        </div>
-        <div class="flex-row">
-            <input type="text" id="answerInput" placeholder="Type your answer" autocomplete="off" style="flex: 1;">
-        </div>
-        <div id="emptyAnswerError" class="error-message">⚠️ Please enter an answer before submitting</div>
-        <div class="flex-row">
-            <button id="submitBtn">submit</button>
-        </div>
-        <div id="feedbackBox" class="feedback-box hidden"></div>
-        <div id="typoContinueContainer" class="hidden" style="text-align: center; margin: 5px 0;">
-            <button id="typoContinueBtn" class="continue-btn">▶ Continue</button>
-            <span style="color: #8a9bc0; font-size: 0.8rem; margin-left: 10px;">or press Enter</span>
-        </div>
-        <div id="maticStatus" class="hidden"></div>
-        <div id="ttsStatus" class="tts-status hidden"></div>
-        <div class="keyboard-hint">⌨️ Press A, B, C, or D to answer • Press Enter to submit</div>
-        <div class="timer-control" id="timerControls">
-            <label>⏱️ Show question for:</label>
-            <input type="number" id="questionDuration" min="1" max="30" value="5" step="1">
-            <span>seconds</span>
-        </div>
-        <div class="timer-control" id="timerControls2">
-            <label>📖 Show answer for:</label>
-            <input type="number" id="answerDuration" min="1" max="30" value="2" step="1">
-            <span>seconds</span>
-        </div>
-        <div class="tts-controls" id="ttsControls">
-            <div class="voice-lang-control">
-                <label>🌐 Voice:</label>
-                <div class="voice-lang-toggle">
-                    <button type="button" id="langEnBtn" class="active">EN</button>
-                    <button type="button" id="langFilBtn">FIL</button>
+    <a class="skip-link" href="#mainContent">Skip to content</a>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Main navigation">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16M8 7h8M8 11h8"/></svg>
                 </div>
+                <div><span class="brand-name">BAOspace</span><span class="brand-caption">QUIZ PLATFORM</span></div>
             </div>
-            <div class="voice-warning" id="voiceWarning"></div>
-            <div class="speech-rate-control">
-                <label>🔊 Speed:</label>
-                <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1">
-                <span id="speechRateDisplay">1.0x</span>
-            </div>
-            <div class="timer-control">
-                <label>⏸️ Pause after question:</label>
-                <input type="number" id="ttsPauseDuration" min="0" max="5" value="1" step="0.5" class="tts-pause-input">
-                <span>seconds</span>
-            </div>
-        </div>
-        <div class="center-text">
-            <button id="maticBtn" class="matic-button">🤖 MATIC answering</button>
-            <button id="ttsBtn" class="tts-button" disabled>🔊 TTS (MATIC only)</button>
-        </div>
-    </div>
 
-    <div id="editContainer" class="edit-panel hidden">
-        <h2>✏️ Notepad editor</h2>
-        <div class="removed-info">
-            💾 <strong>Auto-Save Active!</strong> Your changes are saved automatically.<br>
-            📐 <strong>LaTeX Support:</strong> Use <code>$$...$$</code> for display math.<br>
-            🖼️ <strong>Image Support:</strong> Use <code>![alt text](image URL)</code> in questions or answers.<br>
-            ⌨️ <strong>Keyboard Shortcuts:</strong> Press A, B, C, or D to auto-submit answers.<br>
-            📝 <strong>(t) Syntax:</strong> Use <code>(t)</code> before question number for typed answers: <code>(t)1. question - answer</code><br>
-            🔤 <strong>Typo Handling:</strong> Minor typos show yellow feedback with corrected letters highlighted!<br>
-            🔊 <strong>TTS:</strong> Enable MATIC mode, then TTS to hear questions and answers!<br>
-            🌐 <strong>Voice Language:</strong> Switch EN / FIL inside TTS controls.
-        </div>
-        <div class="dropdown-container">
+            <div class="sidebar-group">
+                <div class="sidebar-label">WORKSPACE</div>
+                <nav class="sidebar-nav">
+                    <button type="button" class="nav-item active" id="navQuiz" onclick="openQuizView()" aria-current="page">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16M8 7h8M8 11h8M8 15h5"/></svg>
+                        <span>Practice quiz</span>
+                    </button>
+                    <button type="button" class="nav-item" id="navEditor" onclick="openEditorView()">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg>
+                        <span>Question editor</span>
+                    </button>
+                    <button type="button" class="nav-item" onclick="openQuizSettings()">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg>
+                        <span>Quiz settings</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="sidebar-spacer"></div>
+            <div class="sidebar-note">
+                <div class="sidebar-note-title">A focused place to study</div>
+                <p>Practice at your own pace. Use the editor to manage your questions and settings to customize your session.</p>
+            </div>
+            <div class="sidebar-footer">BAOspace · Personal quiz workspace</div>
+        </aside>
+
+        <div class="app-main">
+            <header class="topbar">
+                <div class="topbar-heading">
+                    <p class="topbar-kicker">YOUR LEARNING SPACE</p>
+                    <h1 class="topbar-title" id="viewTitle">Practice</h1>
+                </div>
+                <div class="topbar-actions">
+                    <div class="subject-control">
+                        <label for="subjectSelect">SELECT SUBJECT</label>
+                        <select id="subjectSelect" class="subject-select" aria-label="Select subject"></select>
+                    </div>
+                    <button type="button" class="icon-button" onclick="openEditorView()" aria-label="Open question editor" title="Open question editor">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <main class="content-area" id="mainContent">
+                <div id="gameContainer" class="game-panel">
+                    <div class="panel-heading">
+                        <div><p class="section-kicker">ACTIVE SESSION</p><h2 id="quizHeading">Practice Test</h2></div>
+                        <div class="session-chip">Study mode</div>
+                    </div>
+
+                    <div class="stats-container">
+                        <div id="timerDisplay" class="timer-display">0:00</div>
+                        <div id="progressDisplay" class="progress-indicator">0 of 0 answered</div>
+                    </div>
+
+                    <div class="question-display" id="questionText">Loading...</div>
+                    <div id="optionsContainer" class="options-container hidden"></div>
+
+                    <div class="quiz-meta">
+                        <span id="testIndicator" class="test-indicator"></span>
+                        <span id="testProgress" class="test-progress"></span>
+                    </div>
+
+                    <div class="flex-row">
+                        <input type="text" id="answerInput" placeholder="Type your answer" autocomplete="off" aria-label="Your answer" style="flex: 1;">
+                    </div>
+                    <div id="emptyAnswerError" class="error-message" role="alert">Please enter an answer before submitting.</div>
+                    <div class="flex-row"><button id="submitBtn" type="button">Submit answer</button></div>
+                    <div id="feedbackBox" class="feedback-box hidden" aria-live="polite"></div>
+                    <div id="typoContinueContainer" class="hidden" style="text-align: center; margin: 10px 0;">
+                        <button id="typoContinueBtn" class="continue-btn" type="button">Continue</button>
+                        <span style="color: var(--muted); font-size: 11px; margin-left: 8px;">or press Enter</span>
+                    </div>
+                    <div id="maticStatus" class="matic-status hidden" aria-live="polite"></div>
+                    <div id="ttsStatus" class="tts-status hidden" aria-live="polite"></div>
+                    <div class="keyboard-hint">Keyboard shortcuts: A–D to choose · Enter to submit</div>
+
+                    <div class="quiz-actions">
+                        <button id="maticBtn" class="matic-button" type="button">MATIC answering</button>
+                        <button id="ttsBtn" class="tts-button" type="button" disabled>TTS · MATIC only</button>
+                        <button id="focusModeBtn" class="focus-toggle" type="button" onclick="toggleFocusMode()" aria-pressed="false" title="Hide navigation and focus on the quiz">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                            <span id="focusModeLabel">Focus mode</span>
+                        </button>
+                    </div>
+
+                    <details class="settings-drawer" id="quizSettings">
+                        <summary>Advanced quiz and audio settings</summary>
+                        <div class="settings-inner">
+                            <div class="timer-control" id="timerControls">
+                                <label for="questionDuration">Show question for</label>
+                                <input type="number" id="questionDuration" min="1" max="30" value="5" step="1">
+                                <span>seconds</span>
+                            </div>
+                            <div class="timer-control" id="timerControls2">
+                                <label for="answerDuration">Show answer for</label>
+                                <input type="number" id="answerDuration" min="1" max="30" value="2" step="1">
+                                <span>seconds</span>
+                            </div>
+                            <div class="tts-controls" id="ttsControls">
+                                <div class="voice-lang-control">
+                                    <label>Voice language</label>
+                                    <div class="voice-lang-toggle">
+                                        <button type="button" id="langEnBtn" class="active">EN</button>
+                                        <button type="button" id="langFilBtn">FIL</button>
+                                    </div>
+                                </div>
+                                <div class="voice-warning" id="voiceWarning" role="status"></div>
+                                <div class="speech-rate-control">
+                                    <label for="speechRate">Speech speed</label>
+                                    <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1">
+                                    <span id="speechRateDisplay">1.0x</span>
+                                </div>
+                                <div class="timer-control">
+                                    <label for="ttsPauseDuration">Pause after question</label>
+                                    <input type="number" id="ttsPauseDuration" min="0" max="5" value="1" step="0.5" class="tts-pause-input">
+                                    <span>seconds</span>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div id="editContainer" class="edit-panel hidden">
+                    <div class="editor-heading">
+                        <div>
+                            <p class="section-kicker">MANAGE YOUR CONTENT</p>
+                            <h2>Question editor</h2>
+                            <p class="editor-intro">Edit your question sets, preview formatting, and save your changes. Your existing question syntax is supported.</p>
+                        </div>
+                    </div>
+                    <div class="editor-info">
+                        <strong>Auto-save is active.</strong> Changes are saved locally as you edit. Supports LaTeX with <code>$$...$$</code>, images with <code>![alt text](image URL)</code>, typed answers with <code>(t)</code>, and multiple-choice sets.
+                    </div>
+                    <div class="dropdown-container">
             <div class="dropdown-header" onclick="toggleInstructions()">
-                <span>📚 How to Use</span>
-                <span class="arrow">▼</span>
+                <span>How to use the editor</span>
+                <span class="arrow" aria-hidden="true">⌄</span>
             </div>
             <div class="dropdown-content" id="instructionsDropdown">
                 <div class="instruction-section">
-                    <div class="instruction-title">🔊 TTS (Text-to-Speech) Mode</div>
+                    <div class="instruction-title">Text-to-speech mode</div>
                     <div class="instruction-item">• Click <strong>MATIC answering</strong> first to enable auto-answer mode</div>
                     <div class="instruction-item">• Then click <strong>TTS</strong> to enable voice narration</div>
                     <div class="instruction-item">• TTS will read the question and then the answer</div>
@@ -204,19 +845,22 @@
                     <div class="instruction-item">• Use <strong>EN / FIL</strong> toggle to pick English or Filipino voice</div>
                 </div>
                 <div class="instruction-section">
-                    <div class="instruction-title">🔤 Typo Handling</div>
+                    <div class="instruction-title">Typo handling</div>
                     <div class="instruction-item">• Minor typos are automatically accepted!</div>
                     <div class="instruction-item">• Yellow feedback shows the corrected answer</div>
                     <div class="instruction-item">• Click "Continue" or press Enter to proceed</div>
                 </div>
                 <div class="instruction-section">
-                    <div class="instruction-title">⌨️ Keyboard Shortcuts</div>
+                    <div class="instruction-title">Keyboard shortcuts</div>
                     <div class="instruction-item">• Press <strong>A, B, C, or D</strong> to instantly select and submit that option</div>
                     <div class="instruction-item">• Press <strong>Enter</strong> to submit your typed answer</div>
                 </div>
             </div>
         </div>
-        <textarea id="questionNotepad" oninput="updateLivePreview()">multiple.cho()
+                    <div class="editor-workspace">
+                        <section class="editor-pane">
+                            <div class="pane-heading"><span>Question source</span><span class="pane-caption">Editable text</span></div>
+                            <textarea id="questionNotepad" oninput="updateLivePreview()">multiple.cho()
 random(Typo and Number Test)
 (t)1. What is the correct spelling of the main character? - protagonist
 (t)2. What blood cells carry oxygen? - red blood cells
@@ -235,42 +879,53 @@ random(Multiple Choice Examples)
 2. What is the chemical symbol for water? - H2O
 3. What is the fastest land animal? - cheetah
 4. What is the tallest mountain on Earth? - Mount Everest</textarea>
-        <div class="latex-preview">
-            <div class="latex-preview-title">📐 Live Preview (LaTeX + Images)</div>
-            <div id="latexPreview" class="preview-content"></div>
+                        </section>
+                        <section class="preview-pane">
+                            <div class="pane-heading"><span>Live preview</span><span class="pane-caption">LaTeX and images</span></div>
+                            <div class="latex-preview"><div class="latex-preview-title">Live Preview</div><div id="latexPreview" class="preview-content"></div></div>
+                        </section>
+                    </div>
+                    <div class="editor-actions">
+                        <button onclick="parseAndSaveNotepad()" class="auto-save-btn" type="button">Apply changes & restart</button>
+                        <button onclick="downloadJson()" class="save-as-btn" type="button">Export JSON</button>
+                        <button class="small" type="button" onclick="document.getElementById('importFile').click()">Import file</button>
+                        <input type="file" id="importFile" accept=".json,.txt" class="hidden" onchange="importFile(this)">
+                        <button class="small" type="button" onclick="resetSubject()">Reset subject</button>
+                        <button class="small" type="button" onclick="openQuizView()">Back to quiz</button>
+                    </div>
+                    <div id="autoSaveStatus" class="auto-save-status">Auto-saving enabled</div>
+                </div>
+
+                <div id="scoreContainer" class="score-panel hidden">
+                    <div class="results-header"><p class="section-kicker">SESSION SUMMARY</p><h2>Test completed</h2></div>
+                    <div class="score-summary">
+                        <div class="score-main"><span class="score-label">FINAL SCORE</span><div class="score-number" id="finalScoreDisplay">0/0</div></div>
+                        <div class="results-stats">
+                            <p id="timeTakenDisplay" class="results-stat"><span class="results-stat-label">Time taken</span>Time</p>
+                            <p id="averageTimeDisplay" class="results-stat"><span class="results-stat-label">Average per question</span></p>
+                            <p id="testsCompletedDisplay" class="results-stat"><span class="results-stat-label">Tests completed</span></p>
+                        </div>
+                    </div>
+                    <div class="flex-row results-actions">
+                        <button onclick="resetGame()" type="button" class="primary-button">Try again</button>
+                        <button onclick="showReviewPanel()" type="button">Review answers</button>
+                    </div>
+                </div>
+
+                <div id="reviewContainer" class="review-panel hidden">
+                    <div class="results-header"><p class="section-kicker">ANSWER BREAKDOWN</p><h2>Review answers</h2></div>
+                    <div id="reviewList"></div>
+                    <button onclick="hideReview()" type="button">Back to results</button>
+                </div>
+            </main>
         </div>
-        <div class="flex-row">
-            <button onclick="parseAndSaveNotepad()" class="auto-save-btn">🔄 APPLY & RESTART</button>
-            <button onclick="downloadJson()" class="save-as-btn">⬇ EXPORT JSON</button>
-            <button class="small" onclick="document.getElementById('importFile').click()">📂 IMPORT</button>
-            <input type="file" id="importFile" accept=".json,.txt" class="hidden" onchange="importFile(this)">
-            <button class="small" onclick="resetSubject()">♻ reset</button>
-            <button class="small" onclick="toggleEditor()">↩ back</button>
-        </div>
-        <div id="autoSaveStatus" class="auto-save-status" style="margin-top: 10px;">✓ Auto-saving enabled</div>
     </div>
 
-    <div id="scoreContainer" class="score-panel hidden">
-        <h2>🏁 FINISHED</h2>
-        <div class="score-number" id="finalScoreDisplay">0/0</div>
-        <p id="timeTakenDisplay" style="font-size:1.3rem;">time</p>
-        <p id="averageTimeDisplay" style="font-size:1.1rem;"></p>
-        <p id="testsCompletedDisplay" style="font-size:1.1rem;"></p>
-        <div class="flex-row">
-            <button onclick="resetGame()">🔄 play again</button>
-            <button onclick="showReviewPanel()">📋 review answers</button>
-        </div>
-    </div>
+    <audio id="correctSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+    <audio id="incorrectSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    <div id="saveNotification" class="save-notification hidden" role="status">File saved</div>
 
-    <div id="reviewContainer" class="review-panel hidden">
-        <h2>🔍 review</h2>
-        <div id="reviewList"></div>
-        <button onclick="hideReview()">⬅ back</button>
-    </div>
-
-    <div id="saveNotification" class="save-notification hidden">✅ File saved!</div>
-
-    <script>
+        <script>
         (function() {
             // ============================================================
             // UTILITIES
@@ -453,7 +1108,7 @@ random(Multiple Choice Examples)
                             const answer = parts[1].trim();
                             const qSpan = document.createElement('span');
                             qSpan.style.color = '#ffb86b'; qSpan.style.fontWeight = 'bold';
-                            qSpan.innerHTML = isTyped ? '✏️ Q: ' : 'Q: ';
+                            qSpan.textContent = 'Q: ';
                             const qContent = document.createElement('span');
                             qContent.innerHTML = renderLatexToHtml(question);
                             const aSpan = document.createElement('span');
@@ -662,9 +1317,9 @@ random(Multiple Choice Examples)
                 langFilBtn.classList.toggle('active', ttsVoiceLang === 'fil');
                 let warn = '';
                 if (ttsVoiceLang === 'fil' && !hasFil) {
-                    warn = '⚠️ No Filipino voice on this device. Falling back to English. On Windows: Settings → Time & Language → Language & region → add Filipino.';
+                    warn = 'No Filipino voice is available on this device. Falling back to English. On Windows, add Filipino under Settings → Time & Language → Language & region.';
                 } else if (ttsVoiceLang === 'en' && !hasEn) {
-                    warn = '⚠️ No English voice found. TTS may use the system default.';
+                    warn = 'No English voice was found. TTS may use the system default.';
                 }
                 if (warn) { voiceWarning.textContent = warn; voiceWarning.classList.add('visible'); }
                 else voiceWarning.classList.remove('visible');
@@ -705,7 +1360,7 @@ random(Multiple Choice Examples)
                 const fin = () => { if (done) return; done = true; if (t === autoToken && maticMode) fn(); };
                 u.onend = fin; u.onerror = fin;
                 currentUtterance = u;
-                ttsStatus.textContent = '🔊 Speaking...';
+                ttsStatus.textContent = 'Speaking...';
                 ttsStatus.classList.remove('hidden');
                 speechSynth.speak(u);
             }
@@ -718,7 +1373,7 @@ random(Multiple Choice Examples)
                 const qs = (parseFloat(questionDurationInput.value) || 5) * 1000;
                 const as = (parseFloat(answerDurationInput.value) || 2) * 1000;
                 const pause = (parseFloat(ttsPauseInput.value) || 0) * 1000;
-                maticStatus.innerHTML = ttsEnabled ? '🔊 Reading question...' : `🤖 Showing question...<br>⏱️ Answering in ${qs / 1000} seconds...`;
+                maticStatus.innerHTML = ttsEnabled ? 'Reading question...' : `MATIC is showing the question<br>Answering in ${qs / 1000} seconds...`;
                 maticStatus.classList.remove('hidden');
                 autoSpeak(q.q, () => autoWait(() => revealAuto(q, as), ttsEnabled ? pause : qs));
             }
@@ -727,7 +1382,7 @@ random(Multiple Choice Examples)
                 const box = document.createElement('div');
                 box.id = 'maticAnswerDisplay';
                 box.style.cssText = 'background:#2e8b57;color:white;padding:15px;border-radius:30px;margin:10px 0;text-align:center;font-size:1.2rem;font-weight:bold;border-left:5px solid #a0ffa0;';
-                renderLatex(box, '✅ Answer: ' + q.a);
+                renderLatex(box, 'Answer: ' + q.a);
                 gameDiv.insertBefore(box, maticStatus);
 
                 if (currentOptions) {
@@ -738,7 +1393,7 @@ random(Multiple Choice Examples)
                     answerInput.value = q.a;
                 }
                 feedbackBox.className = 'feedback-box';
-                feedbackBox.textContent = '✅ Correct!';
+                feedbackBox.textContent = 'Correct!';
                 feedbackBox.classList.remove('hidden');
                 submitBtn.classList.add('correct-feedback');
                 correctSound.play().catch(() => {});
@@ -747,7 +1402,7 @@ random(Multiple Choice Examples)
                 answeredQuestions.push({ ...q, userAnswer: q.a, isCorrect: true, time: currentTime, testId: currentTest.originalId });
                 currentTest.currentIndex++;
 
-                maticStatus.innerHTML = ttsEnabled ? '🔊 Reading answer...' : `🤖 Showing answer...<br>⏱️ Moving to next in ${as / 1000} seconds...`;
+                maticStatus.innerHTML = ttsEnabled ? 'Reading answer...' : `MATIC is showing the answer<br>Moving to the next question in ${as / 1000} seconds...`;
                 autoSpeak('The answer is ' + q.a, () => autoWait(advanceAuto, ttsEnabled ? 800 : as));
             }
             function advanceAuto() {
@@ -782,7 +1437,16 @@ random(Multiple Choice Examples)
                 opts.slice(0, 4).forEach((opt, idx) => {
                     const div = document.createElement('div');
                     div.className = 'option-item';
+                    div.setAttribute('role', 'button');
+                    div.setAttribute('tabindex', '0');
+                    div.setAttribute('aria-label', `Option ${keys[idx]}: ${opt.text}`);
                     div.onclick = () => { if (!maticMode && !ttsEnabled) selectAndSubmit(idx); };
+                    div.addEventListener('keydown', event => {
+                        if ((event.key === 'Enter' || event.key === ' ') && !maticMode && !ttsEnabled) {
+                            event.preventDefault();
+                            selectAndSubmit(idx);
+                        }
+                    });
                     const prefix = document.createElement('span');
                     prefix.className = 'option-prefix';
                     prefix.textContent = `${keys[idx]}.`;
@@ -855,8 +1519,8 @@ random(Multiple Choice Examples)
                 isSubmitting = false;
                 selectedOptionIndex = -1;
                 const total = originalQuestions.filter(x => !testRemoved[x.testId]).length;
-                progressDisplay.innerText = `📊 ${answeredQuestions.length}/${total} answered`;
-                testProgress.innerText = `📌 ${currentTest.currentIndex + 1}/${currentTest.questions.length}`;
+                progressDisplay.innerText = `${answeredQuestions.length} of ${total} answered`;
+                testProgress.innerText = `Question ${currentTest.currentIndex + 1} of ${currentTest.questions.length}`;
                 if (maticMode) runAutoCycle();
             }
 
@@ -869,7 +1533,7 @@ random(Multiple Choice Examples)
                 if (!q) return;
                 const userAnswer = answerInput.value.trim();
                 if (!userAnswer) {
-                    emptyAnswerError.textContent = '⚠️ Please enter an answer before submitting';
+                    emptyAnswerError.textContent = 'Please enter an answer before submitting.';
                     showEmptyError();
                     return;
                 }
@@ -887,18 +1551,18 @@ random(Multiple Choice Examples)
                     if (r.isTypo) {
                         feedbackBox.className = 'feedback-box typo';
                         feedbackBox.innerHTML = `
-                            <div style="margin-bottom:5px;">📝 You typed:</div>
+                            <div style="margin-bottom:5px;">Your answer:</div>
                             <div style="color:#0b0f1c;margin-bottom:10px;">"${esc(userAnswer)}"</div>
-                            <div style="margin-bottom:5px;">✅ Correct spelling:</div>
+                            <div style="margin-bottom:5px;">Correct spelling:</div>
                             <div style="font-weight:bold;font-size:1.2rem;">"${highlightDifference(userAnswer, q.a)}"</div>
-                            <div style="margin-top:10px;font-size:0.9rem;color:#0b0f1c;">🟡 Typo accepted as correct!</div>`;
+                            <div style="margin-top:10px;font-size:0.9rem;color:#0b0f1c;">Minor typo accepted as correct.</div>`;
                         feedbackBox.classList.remove('hidden');
                         submitBtn.classList.add('typo-feedback');
                         typoContinueContainer.classList.remove('hidden');
                         waitForTypoContinue().then(() => { typoContinueContainer.classList.add('hidden'); advance(); });
                     } else {
                         feedbackBox.className = 'feedback-box';
-                        feedbackBox.textContent = '✅ Correct!';
+                        feedbackBox.textContent = 'Correct!';
                         feedbackBox.classList.remove('hidden');
                         submitBtn.classList.add('correct-feedback');
                         setTimeout(advance, 500);
@@ -909,7 +1573,7 @@ random(Multiple Choice Examples)
                     feedbackBox.className = 'feedback-box wrong';
                     feedbackBox.innerHTML = '';
                     const span = document.createElement('span');
-                    renderLatex(span, `❌ Incorrect. The correct answer is: "${q.a}"`);
+                    renderLatex(span, `Incorrect. The correct answer is: "${q.a}"`);
                     feedbackBox.appendChild(span);
                     feedbackBox.classList.remove('hidden');
                     setTimeout(advance, 2000);
@@ -925,7 +1589,7 @@ random(Multiple Choice Examples)
                 const q = currentTest.questions[currentTest.currentIndex];
                 if (!q) return;
                 if (currentOptions && !q.isTyped) {
-                    emptyAnswerError.textContent = '⚠️ Pick an option or press A, B, C or D';
+                    emptyAnswerError.textContent = 'Choose an option or press A, B, C, or D.';
                     emptyAnswerError.classList.add('visible');
                     setTimeout(() => emptyAnswerError.classList.remove('visible'), 2000);
                     return;
@@ -966,9 +1630,9 @@ random(Multiple Choice Examples)
                 if (maticMode) { stopMaticMode(); return; }
                 maticMode = true;
                 maticBtn.classList.add('active');
-                maticBtn.textContent = '⏹️ MATIC active (click to stop)';
+                maticBtn.textContent = 'MATIC active · Stop';
                 maticStatus.classList.remove('hidden');
-                maticStatus.innerHTML = '🤖 MATIC mode active - Auto-answering in progress...';
+                maticStatus.innerHTML = 'MATIC mode active — auto-answering in progress';
                 maticStatus.style.background = '#2e8b57';
                 maticStatus.style.padding = '12px';
                 maticStatus.style.borderRadius = '30px';
@@ -977,7 +1641,7 @@ random(Multiple Choice Examples)
                 maticStatus.style.fontWeight = 'bold';
 
                 ttsBtn.disabled = false;
-                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.textContent = 'TTS · MATIC only';
                 ttsBtn.classList.remove('active');
                 ttsControls.classList.add('disabled');
 
@@ -988,7 +1652,7 @@ random(Multiple Choice Examples)
                 autoRevealed = false;
                 maticMode = false;
                 maticBtn.classList.remove('active');
-                maticBtn.textContent = '🤖 MATIC answering';
+                maticBtn.textContent = 'MATIC answering';
                 maticStatus.classList.add('hidden');
                 submitBtn.disabled = false;
                 answerInput.disabled = false;
@@ -1003,7 +1667,7 @@ random(Multiple Choice Examples)
                 timerControls2.style.pointerEvents = 'auto';
 
                 ttsBtn.disabled = true;
-                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.textContent = 'TTS · MATIC only';
                 ttsBtn.classList.remove('active');
                 ttsControls.classList.add('disabled');
 
@@ -1013,7 +1677,7 @@ random(Multiple Choice Examples)
                 if (!maticMode) { alert('Please enable MATIC mode first!'); return; }
                 ttsEnabled = true;
                 ttsBtn.classList.add('active');
-                ttsBtn.textContent = '🔊 TTS ON (click to stop)';
+                ttsBtn.textContent = 'TTS enabled · Stop';
                 ttsControls.classList.remove('disabled');
                 timerControls.style.opacity = '0.4';
                 timerControls.style.pointerEvents = 'none';
@@ -1028,7 +1692,7 @@ random(Multiple Choice Examples)
                 ttsEnabled = false;
                 if (speechSynth.speaking || speechSynth.pending) speechSynth.cancel();
                 ttsBtn.classList.remove('active');
-                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.textContent = 'TTS · MATIC only';
                 ttsControls.classList.add('disabled');
                 ttsStatus.classList.add('hidden');
                 timerControls.style.opacity = '1';
@@ -1090,9 +1754,9 @@ random(Multiple Choice Examples)
                 const content = notepad.value;
                 localStorage.setItem('quiz_notepad_backup', content);
                 if (autoSaveStatus) {
-                    autoSaveStatus.textContent = '✓ Auto-saved';
+                    autoSaveStatus.textContent = 'Auto-saved';
                     autoSaveStatus.style.color = '#2e8b57';
-                    setTimeout(() => { if (autoSaveStatus) autoSaveStatus.textContent = '✓ Auto-saving enabled'; }, 1500);
+                    setTimeout(() => { if (autoSaveStatus) autoSaveStatus.textContent = 'Auto-saving enabled'; }, 1500);
                 }
             }
             function loadAutoSavedNotepad() {
@@ -1107,10 +1771,10 @@ random(Multiple Choice Examples)
             function getTestName(id, oid) { return testNames[oid] || `Test ${oid + 1}`; }
             function updateTestIndicator() {
                 if (currentTest) {
-                    const mode = testModes[currentTest.originalId] ? '🔄' : '📋';
+                    const mode = testModes[currentTest.originalId] ? 'Randomized' : 'In order';
                     const left = remainingTests.length;
-                    const mc = currentTest.isMC ? ' 🎯' : ' ✏️';
-                    testIndicator.innerHTML = `📚 ${currentTest.name}${mc} | ${left} left <span class="test-mode-badge">${mode}</span>`;
+                    const mc = currentTest.isMC ? 'Multiple choice' : 'Typed answer';
+                    testIndicator.innerHTML = `<strong>${currentTest.name}</strong><span class="test-indicator-meta">${mc} · ${left} test${left === 1 ? '' : 's'} remaining · ${mode}</span>`;
                 }
             }
 
@@ -1149,7 +1813,7 @@ random(Multiple Choice Examples)
                 submitBtn.disabled = false;
                 answerInput.disabled = false;
                 ttsBtn.disabled = true;
-                ttsBtn.textContent = '🔊 TTS (MATIC only)';
+                ttsBtn.textContent = 'TTS · MATIC only';
                 ttsBtn.classList.remove('active');
                 ttsControls.classList.add('disabled');
                 timerControls.style.opacity = '1';
@@ -1193,19 +1857,20 @@ random(Multiple Choice Examples)
             // SCORE / REVIEW
             // ============================================================
             function finalizeScore() {
+                setFocusMode(false);
                 gameDiv.classList.add('hidden');
                 scoreDiv.classList.remove('hidden');
                 const total = currentTime;
                 const mins = Math.floor(total/60);
                 const secs = total%60;
-                timeTakenEl.innerText = `⏱️ ${mins}m ${secs}s`;
+                timeTakenEl.innerHTML = `<span class="results-stat-label">Time taken</span>${mins}m ${secs}s`;
                 const totalQ = originalQuestions.filter((_, i) => !testRemoved[originalQuestions[i].testId]).length;
                 const avg = total / totalQ;
                 const avgM = Math.floor(avg/60);
                 const avgS = Math.floor(avg%60);
-                averageTimeEl.innerText = `⚡ ${avgM > 0 ? avgM + 'm ' : ''}${avgS}s/q`;
+                averageTimeEl.innerHTML = `<span class="results-stat-label">Average per question</span>${avgM > 0 ? avgM + 'm ' : ''}${avgS}s`;
                 const active = tests.filter((_, i) => !testRemoved[i]).length;
-                testsCompletedEl.innerText = `📚 ${completedTests.length}/${active} tests`;
+                testsCompletedEl.innerHTML = `<span class="results-stat-label">Tests completed</span>${completedTests.length} of ${active}`;
                 finalScoreEl.innerText = `${score}/${totalQ}`;
             }
             function showReview() {
@@ -1225,15 +1890,15 @@ random(Multiple Choice Examples)
                     const mins = Math.floor(q.time / 60);
                     const secs = q.time % 60;
                     const name = getTestName(q.testId, q.testId);
-                    const mode = testModes[q.testId] ? '🔄' : '📋';
-                    const mc = testMultipleChoice[q.testId] ? ' MC' : ' TA';
+                    const mode = testModes[q.testId] ? 'Randomized' : 'In order';
+                    const mc = testMultipleChoice[q.testId] ? 'Multiple choice' : 'Typed answer';
                     const questionSpan = document.createElement('span');
                     renderLatex(questionSpan, q.q);
                     const answerSpan = document.createElement('span');
                     renderLatex(answerSpan, q.userAnswer);
                     const correctSpan = document.createElement('span');
                     renderLatex(correctSpan, q.a);
-                    div.innerHTML = `<p><strong>${questionSpan.innerHTML}</strong></p><p>📝 ${answerSpan.innerHTML}</p><p>✅ ${correctSpan.innerHTML}</p><p style="color:#8a9bc0;font-size:0.85rem;">⏱️ ${mins > 0 ? mins + 'm ' : ''}${secs}s</p><p style="color:#5f9ea0;font-size:0.85rem;">📚 ${name}${mc} <span style="background:#3c4b6a;padding:2px 8px;border-radius:12px;">${mode}</span></p>`;
+                    div.innerHTML = `<p class="review-question"><strong>${questionSpan.innerHTML}</strong></p><p><span class="review-label">Your answer</span>${answerSpan.innerHTML}</p><p><span class="review-label">Correct answer</span>${correctSpan.innerHTML}</p><p class="review-meta">${mins > 0 ? mins + 'm ' : ''}${secs}s · ${name} · ${mc} · ${mode}</p>`;
                     reviewListEl.appendChild(div);
                 });
             }
@@ -1252,7 +1917,7 @@ random(Multiple Choice Examples)
                     currentTime = Math.floor((Date.now() - startTime) / 1000);
                     const m = Math.floor(currentTime / 60);
                     const s = currentTime % 60;
-                    timerDisplay.innerHTML = `⏱️ ${m}:${s.toString().padStart(2, '0')}`;
+                    timerDisplay.innerHTML = `${m}:${s.toString().padStart(2, '0')}`;
                     if (currentTime > 300) timerDisplay.classList.add('timer-warning');
                     else timerDisplay.classList.remove('timer-warning');
                 }, 100);
@@ -1261,7 +1926,7 @@ random(Multiple Choice Examples)
             function updateTimer() {
                 const m = Math.floor(currentTime / 60);
                 const s = currentTime % 60;
-                timerDisplay.innerHTML = `⏱️ ${m}:${s.toString().padStart(2, '0')}`;
+                timerDisplay.innerHTML = `${m}:${s.toString().padStart(2, '0')}`;
             }
 
             // ============================================================
@@ -1300,6 +1965,15 @@ random(Multiple Choice Examples)
             }
             let currentSubject = 'local';
             const subjectSelect = document.getElementById('subjectSelect');
+            const quizHeading = document.getElementById('quizHeading');
+            function updateQuizHeading() {
+                const selectedSubject = subjectSelect && subjectSelect.selectedOptions && subjectSelect.selectedOptions[0]
+                    ? subjectSelect.selectedOptions[0].textContent.trim()
+                    : '';
+                const headingText = selectedSubject ? `${selectedSubject} Practice Test` : 'Practice Test';
+                if (quizHeading) quizHeading.textContent = headingText;
+                document.title = selectedSubject ? `BAOspace | ${selectedSubject} Practice Test` : 'BAOspace | Quiz Platform';
+            }
             const editKey = f => f === 'local' ? 'quiz_tests' : 'quiz_edit_' + f;
             function applyData(d) {
                 tests = d.tests; testNames = d.names; testModes = d.modes;
@@ -1338,15 +2012,18 @@ random(Multiple Choice Examples)
                     const pick = list.find(x => x.file === last) || list[0];
                     subjectSelect.value = pick.file;
                     await loadSubject(pick.file);
+                    updateQuizHeading();
                 } catch (e) {
                     subjectSelect.classList.add('hidden');
                     currentSubject = 'local';
                     fallbackLoad();
+                    updateQuizHeading();
                 }
                 resetGame();
             }
             subjectSelect.onchange = async () => {
                 try { await loadSubject(subjectSelect.value); } catch { alert('Could not load that subject.'); return; }
+                updateQuizHeading();
                 subjectSelect.blur();
                 resetGame();
             };
@@ -1391,6 +2068,11 @@ random(Multiple Choice Examples)
                 answerInput.addEventListener('input', () => resetError());
 
                 document.addEventListener('keydown', e => {
+                    if (e.key === 'Escape' && document.body.classList.contains('focus-mode')) {
+                        e.preventDefault();
+                        setFocusMode(false);
+                        return;
+                    }
                     if (gameDiv.classList.contains('hidden') || maticMode) return;
                     if (e.ctrlKey || e.metaKey || e.altKey) return;
                     const tag = e.target.tagName;
@@ -1424,8 +2106,27 @@ random(Multiple Choice Examples)
             }
 
             // ============================================================
+            // FOCUS MODE
+            // ============================================================
+            function setFocusMode(enabled) {
+                const active = Boolean(enabled);
+                document.body.classList.toggle('focus-mode', active);
+                const button = document.getElementById('focusModeBtn');
+                const label = document.getElementById('focusModeLabel');
+                if (button) {
+                    button.setAttribute('aria-pressed', String(active));
+                    button.title = active ? 'Return to the full interface' : 'Hide navigation and focus on the quiz';
+                }
+                if (label) label.textContent = active ? 'Exit focus mode' : 'Focus mode';
+            }
+            function toggleFocusMode() {
+                setFocusMode(!document.body.classList.contains('focus-mode'));
+            }
+
+            // ============================================================
             // EXPOSE
             // ============================================================
+            window.toggleFocusMode = toggleFocusMode;
             window.toggleInstructions = () => {
                 instructionsDropdown.classList.toggle('show');
                 dropdownHeader.classList.toggle('open');
@@ -1441,6 +2142,31 @@ random(Multiple Choice Examples)
             window.autoSaveNotepad = autoSaveNotepad;
             window.updateLivePreview = updateLivePreview;
             window.forceCheckAnswer = forceCheckAnswer;
+
+            // Navigation helpers for the redesigned sidebar.
+            window.openQuizView = () => {
+                if (!editDiv.classList.contains('hidden')) toggleEditor();
+                document.getElementById('navQuiz')?.classList.add('active');
+                document.getElementById('navEditor')?.classList.remove('active');
+                const title = document.getElementById('viewTitle');
+                if (title) title.textContent = 'Practice';
+            };
+            window.openEditorView = () => {
+                setFocusMode(false);
+                if (editDiv.classList.contains('hidden')) toggleEditor();
+                document.getElementById('navEditor')?.classList.add('active');
+                document.getElementById('navQuiz')?.classList.remove('active');
+                const title = document.getElementById('viewTitle');
+                if (title) title.textContent = 'Question editor';
+            };
+            window.openQuizSettings = () => {
+                if (!editDiv.classList.contains('hidden')) window.openQuizView();
+                const settings = document.getElementById('quizSettings');
+                if (settings) {
+                    settings.open = true;
+                    settings.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            };
 
             // ============================================================
             // INIT
