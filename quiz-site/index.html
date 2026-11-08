@@ -182,6 +182,43 @@
     .option-item.correct-highlight .option-prefix { color: #bbf7d0; background: rgba(34, 197, 94, .2); }
     .option-item.wrong-highlight { background: var(--danger-soft) !important; border: 1px solid rgba(248, 113, 113, .65) !important; }
     .option-item.wrong-highlight .option-prefix { color: #fecaca; background: rgba(248, 113, 113, .18); }
+
+    /* Multi-part typed blanks (tb) */
+    .blank-answers-container { display: grid; gap: 11px; margin: 0 0 18px; }
+    .blank-answer-row {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+        min-width: 0; padding: 13px 15px;
+        background: #152238; border: 1px solid var(--border); border-radius: 12px;
+    }
+    .blank-number {
+        flex: 0 0 34px; width: 34px; height: 34px;
+        display: grid; place-items: center;
+        color: #b9d9ff; background: #243a58; border-radius: 8px;
+        font-size: 13px; font-weight: 750;
+    }
+    .blank-answer-before {
+        flex: 0 1 auto; min-width: 0; color: #d5e1f0;
+        font-size: 14px; line-height: 1.55; overflow-wrap: anywhere;
+    }
+    .blank-answer-input {
+        flex: 0 1 210px; width: min(210px, 38%); min-width: 115px;
+        min-height: 48px; text-align: center; font-weight: 600;
+        background: #0e192b; border-color: #405572;
+    }
+    .blank-answer-input.is-correct { border-color: var(--success); background: var(--success-soft); }
+    .blank-answer-input.is-wrong { border-color: var(--danger); background: var(--danger-soft); }
+    .blank-answer-tail { flex: 1 1 180px; min-width: 0; color: #d5e1f0; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+    .blank-feedback-list { display: grid; gap: 7px; margin-top: 9px; font-weight: 500; }
+    .blank-feedback-row { padding: 8px 10px; border-radius: 8px; background: rgba(7, 18, 33, .3); }
+    .blank-feedback-row strong { color: #f1f6fd; }
+    .preview-blank-question { display: grid; gap: 7px; }
+    .preview-blank-title { color: #bfdbfe; font-weight: 700; }
+    .preview-blank-row { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+    .preview-blank-number { color: var(--accent); font-weight: 700; }
+    .preview-blank-before { color: #c5d2e3; }
+    .preview-blank-field { display: inline-block; width: 76px; height: 22px; border: 1px dashed #71839d; border-radius: 5px; vertical-align: middle; }
+    .preview-blank-tail { color: #c5d2e3; }
+
     .quiz-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 17px; }
     .test-indicator { display: grid; gap: 2px; min-width: 0; color: #dce8f7; font-size: 12px; font-weight: 650; }
     .test-indicator-meta { color: var(--subtle); font-size: 10px; font-weight: 500; }
@@ -281,6 +318,23 @@
     .editor-workspace { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 14px; align-items: stretch; }
     .editor-pane, .preview-pane { min-width: 0; padding: 13px; background: #101d30; border: 1px solid var(--border); border-radius: 12px; }
     .pane-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; color: #dce8f7; font-size: 12px; font-weight: 700; }
+    .autocomplete-panel {
+        display: none; margin: 0 0 9px; padding: 6px; max-height: 260px; overflow-y: auto;
+        background: #0b1525; border: 1px solid #3a5272; border-radius: 10px;
+        box-shadow: 0 12px 28px rgba(0,0,0,.28); overscroll-behavior: contain;
+    }
+    .autocomplete-panel.visible { display: block; }
+    .autocomplete-item {
+        width: 100%; min-height: 48px; display: flex; align-items: center; gap: 10px;
+        padding: 8px 10px; margin: 0; border: 1px solid transparent; border-radius: 7px;
+        background: transparent; color: var(--text); text-align: left; box-shadow: none; cursor: pointer;
+    }
+    .autocomplete-item:hover, .autocomplete-item.active { background: rgba(96,165,250,.13); border-color: rgba(96,165,250,.28); }
+    .autocomplete-copy { min-width: 0; flex: 1; display: grid; gap: 2px; }
+    .autocomplete-label { color: #e5efff; font: 650 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+    .autocomplete-description { color: var(--muted); font-size: 10px; line-height: 1.35; }
+    .autocomplete-kind { flex: 0 0 auto; padding: 3px 6px; border: 1px solid var(--border-strong); border-radius: 6px; color: #a9c8ee; font-size: 9px; font-weight: 700; }
+    .autocomplete-hint { margin: 4px 3px 1px; color: var(--subtle); font-size: 9px; text-align: right; }
     .pane-caption { color: var(--subtle); font-size: 10px; font-weight: 500; }
     textarea { display: block; min-height: 520px; resize: vertical; border-radius: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.65; background: #0b1525; border-color: #2a3b55; }
     .latex-preview { min-height: 520px; margin: 0; padding: 13px; background: #0b1525; border: 1px solid #2a3b55; border-radius: 9px; overflow-wrap: anywhere; }
@@ -301,7 +355,10 @@
     .results-stats { display: grid; grid-template-columns: 1fr; gap: 9px; }
     .results-stat { margin: 0; padding: 13px 15px; color: #dce8f7; background: #142238; border: 1px solid var(--border); border-radius: 10px; font-size: 12px !important; }
     .results-stat-label { display: block; margin-bottom: 2px; color: var(--subtle); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
-    .flex-row.results-actions { gap: 10px; }
+    .flex-row.results-actions { gap: 10px; align-items: center; }
+    .round-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .round-status { margin: 0 0 16px; padding: 12px 14px; color: #c7d8ee; background: rgba(96, 165, 250, .08); border: 1px solid rgba(96, 165, 250, .18); border-radius: 10px; font-size: 13px; line-height: 1.55; }
+    .round-actions button { min-width: 0; }
     .review-item { margin: 0 0 12px; padding: 16px; background: #142238; border: 1px solid var(--border); border-left: 3px solid var(--border-strong); border-radius: 11px; text-align: left; }
     .review-item.correct { border-left-color: var(--success); }
     .review-item.incorrect { border-left-color: var(--danger); }
@@ -395,6 +452,11 @@
         text-align: center;
     }
     body.focus-mode .question-display img { max-height: 34vh; }
+    body.focus-mode .blank-answers-container { gap: 14px; margin-bottom: 0; }
+    body.focus-mode .blank-answer-row { min-height: 78px; gap: 16px; padding: 17px 20px; border-radius: 15px; }
+    body.focus-mode .blank-number { flex-basis: 44px; width: 44px; height: 44px; font-size: 16px; }
+    body.focus-mode .blank-answer-input { flex-basis: 260px; width: min(260px, 35%); min-height: 58px; font-size: 18px; }
+    body.focus-mode .blank-answer-tail { font-size: 17px; line-height: 1.5; }
     body.focus-mode .options-container {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -550,6 +612,10 @@
     }
     /* Mobile readability and touch targets, including the regular quiz view. */
     @media (max-width: 760px) {
+        .flex-row.results-actions { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+        .flex-row.results-actions > button { width: 100%; min-height: 50px; }
+        .round-actions { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: 9px; }
+        .round-actions button { width: 100%; min-height: 50px; }
         .question-display {
             min-height: 150px;
             padding: 23px 19px;
@@ -564,6 +630,10 @@
         }
         .option-prefix { width: 36px; min-width: 36px; height: 36px; font-size: 14px; }
         .option-text { font-size: 16px; line-height: 1.45; }
+        .blank-answer-row { gap: 10px; padding: 13px; }
+        .blank-answer-before { flex: 0 1 auto; font-size: 15px; }
+        .blank-answer-input { flex: 0 1 170px; width: min(170px, 42%); min-width: 112px; min-height: 56px; font-size: 17px; }
+        .blank-answer-tail { flex-basis: 100%; padding-left: 44px; font-size: 15px; }
         #submitBtn { min-height: 58px; font-size: 16px; }
         button { min-height: 48px; }
         .settings-drawer > summary { min-height: 54px; }
@@ -595,6 +665,12 @@
             text-align: left;
         }
         body.focus-mode .question-display img { max-height: 25svh; max-height: 25dvh; }
+        body.focus-mode .blank-answers-container { gap: 12px; }
+        body.focus-mode .blank-answer-row { min-height: 82px; padding: 16px 15px; gap: 11px; }
+        body.focus-mode .blank-number { flex-basis: 42px; width: 42px; height: 42px; font-size: 16px; }
+        body.focus-mode .blank-answer-before { font-size: 17px; }
+        body.focus-mode .blank-answer-input { flex: 0 1 180px; width: min(180px, 45%); min-height: 64px; font-size: 18px; }
+        body.focus-mode .blank-answer-tail { flex-basis: 100%; padding-left: 53px; font-size: 17px; }
         body.focus-mode .options-container {
             grid-template-columns: minmax(0, 1fr);
             gap: 11px;
@@ -682,6 +758,74 @@
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
+
+
+    /* BAOspace image library */
+    .image-tools-toolbar {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+        margin: 0 0 11px; padding: 10px; background: #142238;
+        border: 1px solid var(--border); border-radius: 10px;
+    }
+    .image-tool-button { display: inline-flex; align-items: center; gap: 7px; min-width: 0; min-height: 38px; margin: 0; padding: 8px 11px; font-size: 11px; }
+    .image-tool-button svg { flex: 0 0 16px; color: var(--accent); }
+    .image-storage-status { flex: 1 1 220px; min-width: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .baospace-inline-image {
+        display: block; max-width: min(100%, 620px); max-height: 420px;
+        width: auto; height: auto; object-fit: contain; margin: 13px auto;
+        border: 1px solid var(--border-strong); border-radius: 10px;
+        background: #0b1525; cursor: zoom-in;
+    }
+    .preview-line .baospace-inline-image { max-width: 100%; max-height: 220px; margin: 8px auto; }
+    .option-text .baospace-inline-image { max-height: 170px; margin: 7px 0; }
+    .review-item .baospace-inline-image { max-height: 330px; margin: 10px 0; }
+    .image-reference-missing { display: inline-block; padding: 5px 8px; color: #fecaca; background: rgba(248,113,113,.1); border: 1px dashed rgba(248,113,113,.5); border-radius: 7px; font-size: 11px; }
+    .image-library-dialog {
+        width: min(980px, calc(100vw - 28px)); max-width: 980px; max-height: min(86vh, 850px);
+        padding: 0; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong);
+        border-radius: 18px; box-shadow: 0 24px 80px rgba(0,0,0,.5); overflow: hidden;
+    }
+    .image-library-dialog::backdrop { background: rgba(2, 6, 23, .78); backdrop-filter: blur(5px); }
+    .image-library-shell { display: flex; flex-direction: column; max-height: min(86vh, 850px); padding: 22px; }
+    .image-library-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .image-library-header h2 { margin: 3px 0 0; padding: 0; border: 0; font-size: 22px; }
+    .image-library-intro { margin: 7px 0 0; max-width: 620px; color: var(--muted); font-size: 12px; }
+    .image-library-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 17px 0 12px; }
+    .image-library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; overflow-y: auto; min-height: 0; padding: 2px 3px 8px 0; }
+    .image-library-card { min-width: 0; padding: 10px; background: #101d30; border: 1px solid var(--border); border-radius: 12px; }
+    .image-library-thumb { display: grid; place-items: center; width: 100%; height: 118px; padding: 5px; background: #0b1525; border-radius: 8px; overflow: hidden; }
+    .image-library-thumb img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; cursor: zoom-in; }
+    .image-library-name { margin: 8px 0 3px; color: #e4edf8; font-size: 11px; font-weight: 650; overflow-wrap: anywhere; }
+    .image-library-meta { margin: 0 0 9px; color: var(--subtle); font-size: 10px; }
+    .image-library-card-actions { display: flex; gap: 6px; }
+    .image-library-card-actions button { flex: 1; min-width: 0; min-height: 34px; margin: 0; padding: 6px 8px; border-radius: 8px; box-shadow: none; font-size: 10px; }
+    .image-library-card-actions .insert-image-button { color: #dbeafe; background: rgba(59,130,246,.22); border: 1px solid rgba(96,165,250,.25); }
+    .image-library-card-actions .delete-image-button { color: #fecaca; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.2); }
+    .image-library-card-actions button:disabled { opacity: .35; cursor: not-allowed; }
+    .image-library-empty { margin: 20px 0; color: var(--muted); font-size: 13px; text-align: center; }
+    .image-library-footnote { margin: 12px 0 0; padding-top: 11px; color: var(--subtle); border-top: 1px solid var(--border); font-size: 10px; line-height: 1.5; }
+    .image-lightbox { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; padding: 58px 18px 24px; background: rgba(2,6,23,.94); cursor: zoom-out; }
+    .image-lightbox.hidden { display: none !important; }
+    .image-lightbox-close { position: absolute; top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); min-width: 76px; min-height: 40px; margin: 0; padding: 8px 13px; border: 1px solid rgba(255,255,255,.2); border-radius: 9px; color: white; background: rgba(30,41,59,.85); box-shadow: none; font-size: 12px; }
+    .image-lightbox-figure { display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 100%; max-height: 100%; margin: 0; cursor: default; }
+    .image-lightbox-figure img { display: block; max-width: min(96vw, 1500px); max-height: 78vh; max-height: 78dvh; width: auto; height: auto; object-fit: contain; border-radius: 8px; }
+    .image-lightbox-figure figcaption { color: #dbeafe; font-size: 12px; text-align: center; overflow-wrap: anywhere; }
+    @media (max-width: 760px) {
+        .image-tools-toolbar { gap: 7px; padding: 9px; }
+        .image-tool-button { flex: 1 1 auto; justify-content: center; min-height: 42px; font-size: 12px; }
+        .image-storage-status { flex-basis: 100%; }
+        .image-library-shell { padding: 16px; }
+        .image-library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+        .image-library-thumb { height: 105px; }
+        .image-library-card-actions button { min-height: 40px; font-size: 11px; }
+        .baospace-inline-image { max-width: 100%; max-height: 50vh; max-height: 50dvh; }
+    }
+    @media (max-width: 380px) {
+        .image-library-grid { grid-template-columns: 1fr; }
+        .image-library-card { display: grid; grid-template-columns: 104px minmax(0,1fr); column-gap: 10px; align-items: center; }
+        .image-library-thumb { grid-row: span 3; height: 90px; }
+        .image-library-card-actions { grid-column: 2; }
+    }
+
 </style>
 </head>
 <body>
@@ -752,6 +896,7 @@
 
                     <div class="question-display" id="questionText">Loading...</div>
                     <div id="optionsContainer" class="options-container hidden"></div>
+                    <div id="blankAnswersContainer" class="blank-answers-container hidden" aria-label="Fill in the blanks"></div>
 
                     <div class="quiz-meta">
                         <span id="testIndicator" class="test-indicator"></span>
@@ -823,11 +968,11 @@
                         <div>
                             <p class="section-kicker">MANAGE YOUR CONTENT</p>
                             <h2>Question editor</h2>
-                            <p class="editor-intro">Edit your question sets, preview formatting, and save your changes. Your existing question syntax is supported.</p>
+                            <p class="editor-intro">Edit your question sets, preview formatting, and save your changes. Autocomplete suggestions appear as you type supported commands and syntax.</p>
                         </div>
                     </div>
                     <div class="editor-info">
-                        <strong>Auto-save is active.</strong> Changes are saved locally as you edit. Supports LaTeX with <code>$$...$$</code>, images with <code>![alt text](image URL)</code>, typed answers with <code>(t)</code>, and multiple-choice sets.
+                        <strong>Auto-save is active.</strong> Changes are saved locally as you edit. Use <strong>Question templates</strong> to insert a standard question, typed answer, typed blanks, sentence-style blanks, multiple-choice test set, or image question. Templates are inserted at the cursor and the question placeholder is selected for easy replacement.
                     </div>
                     <div class="dropdown-container">
             <div class="dropdown-header" onclick="toggleInstructions()">
@@ -845,6 +990,27 @@
                     <div class="instruction-item">• Use <strong>EN / FIL</strong> toggle to pick English or Filipino voice</div>
                 </div>
                 <div class="instruction-section">
+                    <div class="instruction-title">Question templates</div>
+                    <div class="instruction-item">• Click <strong>Question templates</strong> above the editor to insert a ready-made question format at the cursor.</div>
+                    <div class="instruction-item">• Available formats: standard, typed answer, numbered typed blanks, sentence-style typed blanks, multiple-choice test set, and image-based question.</div>
+                    <div class="instruction-item">• The question placeholder is selected after insertion so you can immediately replace it by typing.</div>
+                </div>
+                <div class="instruction-section">
+                    <div class="instruction-title">Images</div>
+                    <div class="instruction-item">• Click <strong>Upload image</strong> to choose images from your computer or phone. The reference is inserted at the current cursor position.</div>
+                    <div class="instruction-item">• Use <strong>Image library</strong> to reuse saved images. Tap or click an image in the quiz or preview to enlarge it.</div>
+                    <div class="instruction-item">• Images are stored in this browser. Export a question set to include its referenced images when moving to another device.</div>
+                </div>
+                <div class="instruction-section">
+                    <div class="instruction-title">Typed blanks (tb)</div>
+                    <div class="instruction-item">• Start the question with <strong>(tb)</strong>, then write the question, a hyphen, and semicolon-separated answer parts.</div>
+                    <div class="instruction-item">• Numbered format: <code>(tb)1. Three states - 1. (solid) is a state; 2. (liquid) is a state;</code></div>
+                    <div class="instruction-item">• Sentence format: <code>(tb)3. SOGIES - 1. firstly (Sexual Orientation) is very important;</code></div>
+                    <div class="instruction-item">• Shorthand format: <code>(tb)15. SOGIES - SO. (Sexual Orientation); GI - (Gender Identity);</code></div>
+                    <div class="instruction-item">• Typed blanks work alongside <strong>multiple.cho()</strong>, <strong>random(Test Name)</strong>, and other test settings. The blank question stays a typed question.</div>
+                    <div class="instruction-item">• All blanks must be correct for the question to earn one point. Feedback identifies each incorrect blank, and retry rounds include only the blanks missed in the previous round.</div>
+                </div>
+                <div class="instruction-section">
                     <div class="instruction-title">Typo handling</div>
                     <div class="instruction-item">• Minor typos are automatically accepted!</div>
                     <div class="instruction-item">• Yellow feedback shows the corrected answer</div>
@@ -860,7 +1026,24 @@
                     <div class="editor-workspace">
                         <section class="editor-pane">
                             <div class="pane-heading"><span>Question source</span><span class="pane-caption">Editable text</span></div>
-                            <textarea id="questionNotepad" oninput="updateLivePreview()">multiple.cho()
+                            <div class="image-tools-toolbar" aria-label="Question image tools">
+                                <button type="button" class="small image-tool-button" onclick="openImageUpload()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/><path d="M12 12v6m-3-3h6"/></svg>
+                                    Upload image
+                                </button>
+                                <button type="button" class="small image-tool-button" onclick="openImageLibrary()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                                    Image library
+                                </button>
+                                <button type="button" class="small image-tool-button" onclick="openQuestionTemplates()" aria-haspopup="listbox" aria-controls="autocompletePanel" title="Insert a ready-made question format">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16M8 7h8M8 11h8M8 15h5"/></svg>
+                                    Question templates
+                                </button>
+                                <span id="imageStorageStatus" class="image-storage-status" role="status">Images are stored in this browser. Export your question set to carry referenced images to another device.</span>
+                                <input type="file" id="imageUploadInput" class="hidden" accept="image/*" multiple onchange="handleImageUpload(this)">
+                            </div>
+                            <div id="autocompletePanel" class="autocomplete-panel" role="listbox" aria-label="Code suggestions" aria-live="polite"></div>
+                            <textarea id="questionNotepad" aria-label="Question source editor" aria-autocomplete="list" aria-controls="autocompletePanel" oninput="updateLivePreview(); autoSaveNotepad(); updateAutocomplete()" onkeydown="handleAutocompleteKeydown(event)">multiple.cho()
 random(Typo and Number Test)
 (t)1. What is the correct spelling of the main character? - protagonist
 (t)2. What blood cells carry oxygen? - red blood cells
@@ -896,8 +1079,36 @@ random(Multiple Choice Examples)
                     <div id="autoSaveStatus" class="auto-save-status">Auto-saving enabled</div>
                 </div>
 
+                <dialog id="imageLibraryDialog" class="image-library-dialog" aria-labelledby="imageLibraryTitle">
+                    <div class="image-library-shell">
+                        <div class="image-library-header">
+                            <div>
+                                <p class="section-kicker">BAOSPACE IMAGE STORAGE</p>
+                                <h2 id="imageLibraryTitle">Image library</h2>
+                                <p class="image-library-intro">Reuse images in your questions. Select Insert to add an image reference at the current cursor position.</p>
+                            </div>
+                            <button type="button" class="icon-button" onclick="closeImageLibrary()" aria-label="Close image library" title="Close">×</button>
+                        </div>
+                        <div class="image-library-toolbar">
+                            <button type="button" class="primary-button" onclick="openImageUpload()">Upload images</button>
+                            <span id="imageLibraryCount" class="pane-caption">0 images</span>
+                        </div>
+                        <div id="imageLibraryGrid" class="image-library-grid"></div>
+                        <p id="imageLibraryEmpty" class="image-library-empty hidden">No images yet. Upload an image to start your library.</p>
+                        <p class="image-library-footnote">Images are saved in this browser's IndexedDB. Export a question set to include its referenced images for transfer or backup.</p>
+                    </div>
+                </dialog>
+
+                <div id="imageLightbox" class="image-lightbox hidden" role="dialog" aria-modal="true" aria-label="Enlarged image" onclick="closeImageLightbox()">
+                    <button type="button" class="image-lightbox-close" aria-label="Close enlarged image" onclick="event.stopPropagation(); closeImageLightbox()">Close</button>
+                    <figure class="image-lightbox-figure" onclick="event.stopPropagation()">
+                        <img id="imageLightboxImage" alt="">
+                        <figcaption id="imageLightboxCaption"></figcaption>
+                    </figure>
+                </div>
+
                 <div id="scoreContainer" class="score-panel hidden">
-                    <div class="results-header"><p class="section-kicker">SESSION SUMMARY</p><h2>Test completed</h2></div>
+                    <div class="results-header"><p class="section-kicker">SESSION SUMMARY</p><h2 id="resultsTitle">Test completed</h2></div>
                     <div class="score-summary">
                         <div class="score-main"><span class="score-label">FINAL SCORE</span><div class="score-number" id="finalScoreDisplay">0/0</div></div>
                         <div class="results-stats">
@@ -906,8 +1117,10 @@ random(Multiple Choice Examples)
                             <p id="testsCompletedDisplay" class="results-stat"><span class="results-stat-label">Tests completed</span></p>
                         </div>
                     </div>
+                    <p id="roundStatusDisplay" class="round-status" aria-live="polite"></p>
                     <div class="flex-row results-actions">
-                        <button onclick="resetGame()" type="button" class="primary-button">Try again</button>
+                        <button onclick="resetGame()" type="button" class="primary-button">Try again (original)</button>
+                        <div id="roundActions" class="round-actions" aria-label="Retry rounds"></div>
                         <button onclick="showReviewPanel()" type="button">Review answers</button>
                     </div>
                 </div>
@@ -1054,12 +1267,381 @@ random(Multiple Choice Examples)
             }
 
             // ============================================================
+            // IMAGE LIBRARY (IndexedDB)
+            // ============================================================
+            const imageLibraryCache = new Map();
+            let imageDatabasePromise = null;
+
+            function openImageDatabase() {
+                if (!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB is unavailable in this browser.'));
+                if (imageDatabasePromise) return imageDatabasePromise;
+                imageDatabasePromise = new Promise((resolve, reject) => {
+                    const request = window.indexedDB.open('BAOspaceImageLibrary', 1);
+                    request.onupgradeneeded = () => {
+                        const db = request.result;
+                        if (!db.objectStoreNames.contains('images')) db.createObjectStore('images', { keyPath: 'id' });
+                    };
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error || new Error('Could not open the image library.'));
+                    request.onblocked = () => reject(new Error('The image library is blocked by another open BAOspace tab.'));
+                });
+                return imageDatabasePromise;
+            }
+
+            function runImageStore(mode, action) {
+                return openImageDatabase().then(db => new Promise((resolve, reject) => {
+                    let result;
+                    let settled = false;
+                    let transaction;
+                    try {
+                        transaction = db.transaction('images', mode);
+                        action(transaction.objectStore('images'), value => { result = value; });
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+                    transaction.oncomplete = () => { settled = true; resolve(result); };
+                    transaction.onerror = () => { if (!settled) reject(transaction.error || new Error('Image storage request failed.')); };
+                    transaction.onabort = () => { if (!settled) reject(transaction.error || new Error('Image storage request was cancelled.')); };
+                }));
+            }
+
+            function getAllStoredImages() {
+                return runImageStore('readonly', (store, setResult) => {
+                    const request = store.getAll();
+                    request.onsuccess = () => setResult(request.result || []);
+                });
+            }
+            function putStoredImage(record) {
+                return runImageStore('readwrite', (store, setResult) => {
+                    const request = store.put(record);
+                    request.onsuccess = () => setResult(record);
+                });
+            }
+            function deleteStoredImage(id) {
+                return runImageStore('readwrite', (store, setResult) => {
+                    const request = store.delete(id);
+                    request.onsuccess = () => setResult(true);
+                });
+            }
+
+            async function loadImageLibrary() {
+                const records = await getAllStoredImages();
+                imageLibraryCache.clear();
+                records.forEach(record => imageLibraryCache.set(record.id, record));
+                updateImageStorageStatus();
+                return records;
+            }
+
+            function updateImageStorageStatus() {
+                const status = document.getElementById('imageStorageStatus');
+                const count = imageLibraryCache.size;
+                if (status) status.textContent = `${count} image${count === 1 ? '' : 's'} saved in this browser. Export your question set to carry referenced images to another device.`;
+                const libraryCount = document.getElementById('imageLibraryCount');
+                if (libraryCount) libraryCount.textContent = `${count} image${count === 1 ? '' : 's'}`;
+            }
+
+            function makeImageId() {
+                const randomPart = Math.random().toString(36).slice(2, 10).toUpperCase();
+                return `IMG${Date.now().toString(36).toUpperCase()}${randomPart}`;
+            }
+
+            function blobToDataUrl(blob) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(String(reader.result));
+                    reader.onerror = () => reject(reader.error || new Error('Could not read this image.'));
+                    reader.readAsDataURL(blob);
+                });
+            }
+
+            async function optimizeImageFile(file) {
+                // Keep animated formats unchanged. Try to convert HEIC/HEIF because
+                // browser support varies between desktop and mobile devices.
+                const isHeif = file.type === 'image/heic' || file.type === 'image/heif';
+                if (file.type === 'image/gif' || file.type === 'image/webp' || (!isHeif && file.size < 650 * 1024)) return file;
+                if (typeof createImageBitmap !== 'function') {
+                    if (isHeif) throw new Error('This browser cannot convert HEIC/HEIF. Please choose a JPG or PNG copy of the photo.');
+                    return file;
+                }
+                let bitmap;
+                try {
+                    bitmap = await createImageBitmap(file);
+                    const maxDimension = 1920;
+                    const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+                    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+                    const context = canvas.getContext('2d');
+                    if (!context) return file;
+                    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+                    const optimized = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.88));
+                    return optimized && optimized.size < file.size ? optimized : file;
+                } catch (error) {
+                    if (isHeif) throw new Error('This browser could not decode the HEIC/HEIF photo. Please convert it to JPG or PNG and upload it again.');
+                    return file;
+                } finally {
+                    if (bitmap && typeof bitmap.close === 'function') bitmap.close();
+                }
+            }
+
+            function safeImageAlt(name) {
+                return String(name || 'Uploaded image')
+                    .replace(/\.[a-z0-9]{2,5}$/i, '')
+                    .replace(/[\[\]()]/g, ' ').replace(/\s+/g, ' ')
+                    .replace(/[<>"']/g, '')
+                    .trim() || 'Uploaded image';
+            }
+
+            async function handleImageUpload(input) {
+                const files = Array.from(input.files || []);
+                input.value = '';
+                if (!files.length) return;
+                try {
+                    await openImageDatabase();
+                    const inserted = [];
+                    for (const file of files) {
+                        const allowedTypes = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif', 'image/bmp', 'image/heic', 'image/heif']);
+                        if (!allowedTypes.has(file.type)) {
+                            alert(`“${file.name}” is not a supported image. Use PNG, JPG, WEBP, GIF, AVIF, BMP, or a HEIC/HEIF photo that your browser can decode.`);
+                            continue;
+                        }
+                        if (file.size > 15 * 1024 * 1024) {
+                            alert(`“${file.name}” is larger than 15 MB. Please choose a smaller image.`);
+                            continue;
+                        }
+                        const optimized = await optimizeImageFile(file);
+                        const dataUrl = await blobToDataUrl(optimized);
+                        const record = {
+                            id: makeImageId(),
+                            name: file.name,
+                            alt: safeImageAlt(file.name),
+                            mimeType: optimized.type || file.type,
+                            dataUrl,
+                            sizeBytes: optimized.size,
+                            originalSizeBytes: file.size,
+                            createdAt: new Date().toISOString()
+                        };
+                        await putStoredImage(record);
+                        imageLibraryCache.set(record.id, record);
+                        inserted.push(record);
+                    }
+                    if (inserted.length) {
+                        inserted.forEach(record => insertImageReference(record));
+                        updateImageStorageStatus();
+                        updateLivePreview();
+                        renderImageLibrary();
+                        const status = document.getElementById('autoSaveStatus');
+                        if (status) status.textContent = `${inserted.length} image${inserted.length === 1 ? '' : 's'} added to the image library.`;
+                    }
+                } catch (error) {
+                    alert(`Could not save the image. ${error && error.message ? error.message : 'Check that browser storage is available.'}`);
+                }
+            }
+
+            function openImageUpload() {
+                const input = document.getElementById('imageUploadInput');
+                if (input) input.click();
+            }
+
+            function insertImageReference(record) {
+                if (!notepad || !record) return;
+                const start = Number.isInteger(notepad.selectionStart) ? notepad.selectionStart : notepad.value.length;
+                const end = Number.isInteger(notepad.selectionEnd) ? notepad.selectionEnd : start;
+                const alt = String(record.alt || safeImageAlt(record.name)).replace(/[\[\]]/g, '').trim();
+                const markdown = `![${alt}](baospace-image:${record.id})`;
+                const value = notepad.value;
+                const left = value.slice(0, start);
+                const right = value.slice(end);
+                const prefix = left && !/\s$/.test(left) ? ' ' : '';
+                const suffix = right && !/^\s/.test(right) ? ' ' : '';
+                notepad.value = left + prefix + markdown + suffix + right;
+                const cursor = (left + prefix + markdown + suffix).length;
+                notepad.setSelectionRange(cursor, cursor);
+                notepad.focus();
+                updateLivePreview();
+                autoSaveNotepad();
+            }
+
+            function isImageUsed(id) {
+                const marker = `baospace-image:${id}`;
+                let source = notepad ? notepad.value : '';
+                try { source += JSON.stringify({ tests, originalQuestions, remainingTests, completedTests }); } catch {}
+                try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key === 'quiz_tests' || key.startsWith('quiz_edit_'))) {
+                            source += localStorage.getItem(key) || '';
+                        }
+                    }
+                } catch {}
+                return source.includes(marker);
+            }
+
+            async function openImageLibrary() {
+                const dialog = document.getElementById('imageLibraryDialog');
+                if (!dialog) return;
+                try {
+                    await loadImageLibrary();
+                    renderImageLibrary();
+                    if (typeof dialog.showModal === 'function') dialog.showModal();
+                    else alert('Your browser does not support the image library dialog. Please update your browser.');
+                } catch (error) {
+                    alert(`Could not open the image library. ${error && error.message ? error.message : ''}`);
+                }
+            }
+
+            function closeImageLibrary() {
+                const dialog = document.getElementById('imageLibraryDialog');
+                if (dialog && dialog.open) dialog.close();
+            }
+
+            function renderImageLibrary() {
+                const grid = document.getElementById('imageLibraryGrid');
+                const empty = document.getElementById('imageLibraryEmpty');
+                if (!grid || !empty) return;
+                const records = Array.from(imageLibraryCache.values()).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+                grid.innerHTML = '';
+                empty.classList.toggle('hidden', records.length > 0);
+                updateImageStorageStatus();
+
+                records.forEach(record => {
+                    const card = document.createElement('article');
+                    card.className = 'image-library-card';
+                    const thumb = document.createElement('div');
+                    thumb.className = 'image-library-thumb';
+                    const img = document.createElement('img');
+                    img.src = record.dataUrl;
+                    img.alt = record.alt || record.name || 'Uploaded image';
+                    img.loading = 'lazy';
+                    img.addEventListener('click', () => openImageLightbox(record.dataUrl, img.alt));
+                    thumb.appendChild(img);
+                    const name = document.createElement('p');
+                    name.className = 'image-library-name';
+                    name.textContent = record.name || record.id;
+                    const meta = document.createElement('p');
+                    meta.className = 'image-library-meta';
+                    const used = isImageUsed(record.id);
+                    meta.textContent = `${formatImageSize(record.sizeBytes || 0)} · ${used ? 'Used in saved questions' : 'Not referenced in current saved questions'}`;
+                    const actions = document.createElement('div');
+                    actions.className = 'image-library-card-actions';
+                    const insert = document.createElement('button');
+                    insert.type = 'button';
+                    insert.className = 'insert-image-button';
+                    insert.textContent = 'Insert';
+                    insert.addEventListener('click', () => insertImageReference(record));
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'delete-image-button';
+                    remove.textContent = 'Delete';
+                    remove.disabled = used;
+                    remove.title = used ? 'This image is referenced by saved questions.' : 'Delete this unused image';
+                    remove.addEventListener('click', () => removeImageFromLibrary(record.id));
+                    actions.append(insert, remove);
+                    card.append(thumb, name, meta, actions);
+                    grid.appendChild(card);
+                });
+            }
+
+            function formatImageSize(bytes) {
+                if (!Number.isFinite(bytes) || bytes <= 0) return 'Unknown size';
+                if (bytes < 1024) return `${bytes} B`;
+                if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+                return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+            }
+
+            async function removeImageFromLibrary(id) {
+                if (isImageUsed(id)) {
+                    alert('This image is still referenced by saved questions. Remove those references first, then try again.');
+                    return;
+                }
+                const record = imageLibraryCache.get(id);
+                if (!record || !confirm(`Delete “${record.name || 'this image'}” from the image library?`)) return;
+                try {
+                    await deleteStoredImage(id);
+                    imageLibraryCache.delete(id);
+                    renderImageLibrary();
+                } catch (error) {
+                    alert(`Could not delete this image. ${error && error.message ? error.message : ''}`);
+                }
+            }
+
+            function openImageLightbox(src, alt) {
+                const overlay = document.getElementById('imageLightbox');
+                const image = document.getElementById('imageLightboxImage');
+                const caption = document.getElementById('imageLightboxCaption');
+                if (!overlay || !image) return;
+                image.src = src;
+                image.alt = alt || 'Enlarged question image';
+                if (caption) caption.textContent = alt || '';
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeImageLightbox() {
+                const overlay = document.getElementById('imageLightbox');
+                const image = document.getElementById('imageLightboxImage');
+                if (overlay) overlay.classList.add('hidden');
+                if (image) image.removeAttribute('src');
+                document.body.style.overflow = '';
+            }
+
+            function getImageIdsFromData(data) {
+                const serialized = JSON.stringify(data || {});
+                const ids = new Set();
+                const pattern = /baospace-image:([A-Za-z0-9_-]+)/g;
+                let match;
+                while ((match = pattern.exec(serialized))) ids.add(match[1]);
+                return Array.from(ids);
+            }
+
+            async function restoreImageBundle(data) {
+                if (!data || typeof data !== 'object') return data;
+                const assets = data.__baospaceImageAssets || data.imageAssets || [];
+                if (Array.isArray(assets) && assets.length) {
+                    for (const asset of assets) {
+                        if (!asset || typeof asset.id !== 'string' || typeof asset.dataUrl !== 'string' || !/^data:image\/(png|jpeg|webp|gif|avif|bmp);base64,/i.test(asset.dataUrl)) continue;
+                        const record = {
+                            id: asset.id,
+                            name: String(asset.name || asset.id),
+                            alt: String(asset.alt || safeImageAlt(asset.name || 'Uploaded image')),
+                            mimeType: String(asset.mimeType || asset.dataUrl.slice(5, asset.dataUrl.indexOf(';'))),
+                            dataUrl: asset.dataUrl,
+                            sizeBytes: Number(asset.sizeBytes) || Math.ceil(asset.dataUrl.length * 0.75),
+                            originalSizeBytes: Number(asset.originalSizeBytes) || Number(asset.sizeBytes) || 0,
+                            createdAt: asset.createdAt || new Date().toISOString()
+                        };
+                        await putStoredImage(record);
+                        imageLibraryCache.set(record.id, record);
+                    }
+                }
+                updateImageStorageStatus();
+                const clean = { ...data };
+                delete clean.__baospaceImageAssets;
+                delete clean.imageAssets;
+                return clean;
+            }
+
+            // ============================================================
             // RENDER
             // ============================================================
             function convertMarkdownImages(text) {
                 if (!text) return text;
-                return text.replace(/!\[(.*?)\]\((.*?)\)/g, function(match, alt, url) {
-                    return `<img src="${url}" alt="${alt || ''}" loading="lazy" onerror="this.style.display='none'">`;
+                return text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, url) {
+                    const safeAlt = esc(alt || 'Question image');
+                    let src = String(url || '').trim();
+                    if (src.startsWith('baospace-image:')) {
+                        const imageId = src.slice('baospace-image:'.length).trim();
+                        const record = imageLibraryCache.get(imageId);
+                        if (!record || !record.dataUrl) {
+                            return `<span class="image-reference-missing">[Image unavailable: ${safeAlt}]</span>`;
+                        }
+                        src = record.dataUrl;
+                    } else if (!/^(https?:\/\/|data:image\/(png|jpeg|webp|gif|avif|bmp);base64,|\/|\.\.?\/)/i.test(src)) {
+                        return `<span class="image-reference-missing">[Unsupported image source: ${safeAlt}]</span>`;
+                    }
+                    const safeSrc = esc(src);
+                    return `<img class="baospace-inline-image" src="${safeSrc}" alt="${safeAlt}" loading="lazy" tabindex="0" role="button" aria-label="Enlarge image: ${safeAlt}" onerror="this.classList.add('image-load-failed')">`;
                 });
             }
             function renderLatexToHtml(text) {
@@ -1096,36 +1678,75 @@ random(Multiple Choice Examples)
                 let shownLines = 0;
                 for (let i = 0; i < lines.length && shownLines < 8; i++) {
                     const line = lines[i].trim();
-                    if (line && (line.includes('$$') || line.includes('\\(') || line.includes('![') || line.includes('-') || line.startsWith('multiple.cho') || line.startsWith('random') || line.startsWith('(t)'))) {
-                        const previewLine = document.createElement('div');
-                        previewLine.className = 'preview-line';
-                        if (line.includes('-')) {
-                            let cleanLine = line;
-                            let isTyped = false;
-                            if (cleanLine.trim().startsWith('(t)')) { isTyped = true; cleanLine = cleanLine.replace(/^\(t\)\s*/, ''); }
-                            const parts = cleanLine.split('-');
-                            const question = parts[0].trim().replace(/^\d+\.\s*/, '');
-                            const answer = parts[1].trim();
-                            const qSpan = document.createElement('span');
-                            qSpan.style.color = '#ffb86b'; qSpan.style.fontWeight = 'bold';
-                            qSpan.textContent = 'Q: ';
-                            const qContent = document.createElement('span');
-                            qContent.innerHTML = renderLatexToHtml(question);
-                            const aSpan = document.createElement('span');
-                            aSpan.style.color = '#5f9ea0'; aSpan.style.marginLeft = '15px'; aSpan.innerHTML = ' → ';
-                            const aContent = document.createElement('span');
-                            aContent.innerHTML = renderLatexToHtml(answer);
-                            previewLine.appendChild(qSpan); previewLine.appendChild(qContent);
-                            previewLine.appendChild(aSpan); previewLine.appendChild(aContent);
+                    if (!line) continue;
+                    const isBlankSet = /^\(tb\)/i.test(line);
+                    const isQuestionLine = line.includes(' - ') || /^\(t\)/i.test(line) || isBlankSet || /^\d+\.\s/.test(line) && /!\[[^\]]*\]\([^)]*\)/.test(line);
+                    if (!(isQuestionLine || line.startsWith('multiple.cho') || line.startsWith('random') || line.startsWith('(t)'))) continue;
+
+                    const previewLine = document.createElement('div');
+                    previewLine.className = 'preview-line';
+
+                    if (isBlankSet) {
+                        const questionLine = line.replace(/^\(tb\)\s*/i, '');
+                        const parsed = parseQuestion(questionLine);
+                        const items = parsed ? parseBlankItems(parsed.a) : null;
+                        if (!parsed || !items) {
+                            previewLine.textContent = 'Invalid typed-blanks syntax. Check the numbered answers and parentheses.';
+                            previewLine.style.color = '#fca5a5';
                         } else {
-                            previewLine.innerHTML = renderLatexToHtml(line);
-                            if (line.startsWith('multiple.cho') || line.startsWith('random')) {
-                                previewLine.style.color = '#5f9ea0'; previewLine.style.fontWeight = 'bold';
-                            }
+                            const wrap = document.createElement('div');
+                            wrap.className = 'preview-blank-question';
+                            const title = document.createElement('div');
+                            title.className = 'preview-blank-title';
+                            renderLatex(title, parsed.q);
+                            wrap.appendChild(title);
+                            items.forEach((item, index) => {
+                                const row = document.createElement('div');
+                                row.className = 'preview-blank-row';
+                                const number = document.createElement('span');
+                                number.className = 'preview-blank-number';
+                                number.textContent = `${index + 1}.`;
+                                const before = document.createElement('span');
+                                before.className = 'preview-blank-before';
+                                renderLatex(before, item.before || '');
+                                const field = document.createElement('span');
+                                field.className = 'preview-blank-field';
+                                field.setAttribute('aria-label', `Blank ${index + 1}`);
+                                const tail = document.createElement('span');
+                                tail.className = 'preview-blank-tail';
+                                renderLatex(tail, item.after || '');
+                                row.append(number, before, field, tail);
+                                wrap.appendChild(row);
+                            });
+                            previewLine.appendChild(wrap);
                         }
-                        previewDiv.appendChild(previewLine);
-                        shownLines++;
+                    } else if (line.includes('-')) {
+                        let cleanLine = line;
+                        let isTyped = false;
+                        if (cleanLine.startsWith('(t)')) { isTyped = true; cleanLine = cleanLine.replace(/^\(t\)\s*/, ''); }
+                        const parsed = parseQuestion(cleanLine);
+                        if (parsed) {
+                            const qSpan = document.createElement('span');
+                            qSpan.style.color = '#bfdbfe'; qSpan.style.fontWeight = 'bold';
+                            qSpan.textContent = isTyped ? 'Typed · Q: ' : 'Q: ';
+                            const qContent = document.createElement('span');
+                            renderLatex(qContent, parsed.q);
+                            const aSpan = document.createElement('span');
+                            aSpan.style.color = '#60a5fa'; aSpan.style.marginLeft = '12px'; aSpan.textContent = ' → ';
+                            const aContent = document.createElement('span');
+                            renderLatex(aContent, parsed.a);
+                            previewLine.append(qSpan, qContent, aSpan, aContent);
+                        } else {
+                            previewLine.textContent = line;
+                        }
+                    } else {
+                        previewLine.textContent = line;
+                        if (line.startsWith('multiple.cho') || line.startsWith('random')) {
+                            previewLine.style.color = '#60a5fa'; previewLine.style.fontWeight = 'bold';
+                        }
                     }
+                    previewDiv.appendChild(previewLine);
+                    shownLines++;
                 }
                 if (shownLines === 0) previewDiv.innerHTML = '<span style="color: #8a9bc0;">No content detected.</span>';
             }
@@ -1134,55 +1755,186 @@ random(Multiple Choice Examples)
             // PARSE
             // ============================================================
             function parseQuestion(line) {
-                const dash = line.indexOf('-');
-                if (dash === -1) return null;
-                let q = line.substring(0, dash).trim().replace(/^\d+\.\s*/, '');
-                let a = line.substring(dash + 1).trim();
+                if (typeof line !== 'string') return null;
+                // Prefer the final spaced answer separator. Image markdown may contain
+                // hyphens in alt text or paths, so an unspaced hyphen is not a safe split.
+                const dash = line.lastIndexOf(' - ');
+                if (dash < 0) return null;
+                const q = line.substring(0, dash).trim().replace(/^\d+\.\s*/, '');
+                const a = line.substring(dash + 3).trim();
+                if (!q || !a) return null;
                 return { q, a };
             }
+
+            // Typed blanks support three interchangeable segment styles:
+            // 1. (answer) text                 -> blank, then trailing text
+            // 1. leading text (answer) trailing text -> leading text, blank, trailing text
+            // SO. (description)               -> legacy shorthand, answer before parentheses
+            function parseBlankItems(source) {
+                if (typeof source !== 'string' || !source.trim()) return null;
+                const segments = source.trim().split(/;\s*/).map(part => part.trim()).filter(Boolean);
+                if (!segments.length) return null;
+                const items = [];
+
+                for (let i = 0; i < segments.length; i++) {
+                    const segment = segments[i].replace(/;\s*$/, '').trim();
+                    if (!segment) continue;
+
+                    const numbered = segment.match(/^(\d+)\.\s*/);
+                    let answer = '';
+                    let before = '';
+                    let after = '';
+                    let body = segment;
+                    let openAt = -1;
+                    let contentStart = -1;
+
+                    if (numbered) {
+                        if (Number(numbered[1]) !== i + 1) return null;
+                        body = segment.slice(numbered[0].length);
+                        openAt = body.indexOf('(');
+                        if (openAt < 0) return null;
+                        before = body.slice(0, openAt).trim();
+                        contentStart = openAt + 1;
+                    } else {
+                        // Legacy shorthand: "SO. (Sexual Orientation)" or "GI - (Gender Identity)".
+                        openAt = segment.indexOf('(');
+                        if (openAt <= 0) return null;
+                        answer = segment.slice(0, openAt)
+                            .replace(/[\s\-–—:.]+$/, '')
+                            .trim();
+                        contentStart = openAt + 1;
+                    }
+
+                    let depth = 1;
+                    let closeAt = -1;
+                    for (let j = contentStart; j < body.length; j++) {
+                        if (body[j] === '(') depth++;
+                        else if (body[j] === ')') {
+                            depth--;
+                            if (depth === 0) { closeAt = j; break; }
+                        }
+                    }
+                    if (closeAt < 0) return null;
+
+                    if (numbered) answer = body.slice(contentStart, closeAt).trim();
+                    if (!answer) return null;
+
+                    after = numbered
+                        ? body.slice(closeAt + 1).trim()
+                        : segment.slice(openAt).trim();
+                    items.push({ before, answer, after });
+                }
+                return items.length ? items : null;
+            }
+
             function parseNotepad(text) {
                 const raw = text.split(/\n\s*\n/);
                 const tests = [], names = [], modes = [], removed = [], mc = [];
+                const errors = [];
+                let absoluteLine = 0;
                 for (let t of raw) {
-                    if (!t.trim()) continue;
+                    if (!t.trim()) { absoluteLine += t.split(/\r?\n/).length; continue; }
                     const lines = t.split(/\r?\n/);
-                    let idx = 0, hasMC = false;
-                    if (lines[idx] && lines[idx].trim() === 'multiple.cho()') { hasMC = true; idx++; }
-                    let name = null, randMode = false, isRemoved = false;
-                    if (lines[idx]) {
-                        let first = lines[idx].trim();
-                        let rmMatch = first.match(/^random\(["']?([^"')]+)["']?\)\s*=\s*xxx$/i);
-                        if (rmMatch) { randMode = true; name = rmMatch[1].trim(); isRemoved = true; idx++; }
-                        else {
-                            let rMatch = first.match(/^random\(["']?([^"')]+)["']?\)$/i);
-                            if (rMatch) { randMode = true; name = rMatch[1].trim(); idx++; }
-                            else {
-                                let qMatch = first.match(/^["']([^"']+)["']\s*=\s*xxx$/i);
-                                if (qMatch) { name = qMatch[1].trim(); isRemoved = true; idx++; }
-                                else {
-                                    let qq = first.match(/^["']([^"']+)["']$/);
-                                    if (qq) { name = qq[1].trim(); idx++; }
-                                    else if (!first.includes('-') && first.length < 50) { name = first; idx++; }
-                                }
-                            }
+                    let idx = 0;
+                    let hasMC = false;
+                    let name = null;
+                    let randMode = false;
+                    let isRemoved = false;
+
+                    // Read all leading test modifiers in any order. Typed-blank
+                    // questions are then parsed like any other question in this
+                    // block, regardless of randomization or multiple-choice mode.
+                    while (idx < lines.length) {
+                        const first = (lines[idx] || '').trim();
+                        if (!first || first.startsWith('//')) { idx++; continue; }
+
+                        if (/^multiple\.cho\s*\(\s*\)$/i.test(first)) {
+                            hasMC = true;
+                            idx++;
+                            continue;
                         }
+
+                        const removedRandom = first.match(/^random\(["']?([^"')]+)["']?\)\s*=\s*xxx$/i);
+                        if (removedRandom) {
+                            randMode = true;
+                            name = removedRandom[1].trim();
+                            isRemoved = true;
+                            idx++;
+                            continue;
+                        }
+                        const random = first.match(/^random\(["']?([^"')]+)["']?\)$/i);
+                        if (random) {
+                            randMode = true;
+                            name = random[1].trim();
+                            idx++;
+                            continue;
+                        }
+
+                        const removedTitle = first.match(/^["']([^"']+)["']\s*=\s*xxx$/i);
+                        if (removedTitle) {
+                            name = removedTitle[1].trim();
+                            isRemoved = true;
+                            idx++;
+                            continue;
+                        }
+                        const quotedTitle = first.match(/^["']([^"']+)["']$/);
+                        if (quotedTitle) {
+                            name = quotedTitle[1].trim();
+                            idx++;
+                            continue;
+                        }
+
+                        if (!name && !/^\(tb\)/i.test(first) && !/^\(t\)/i.test(first) && !first.includes('-') && first.length < 50) {
+                            name = first;
+                            idx++;
+                            continue;
+                        }
+                        break;
                     }
+
                     const questions = [];
                     for (let i = idx; i < lines.length; i++) {
                         let line = lines[i].trim();
                         if (!line || line.startsWith('//')) continue;
+                        const isBlankSet = /^\(tb\)/i.test(line);
                         let isTyped = false;
-                        if (line.trim().startsWith('(t)')) { isTyped = true; line = line.replace(/^\(t\)\s*/, ''); }
-                        let p = parseQuestion(line);
-                        if (p) { p.isTyped = isTyped; questions.push(p); }
+                        if (isBlankSet) {
+                            line = line.replace(/^\(tb\)\s*/i, '');
+                            isTyped = true;
+                        } else if (line.startsWith('(t)')) {
+                            isTyped = true;
+                            line = line.replace(/^\(t\)\s*/, '');
+                        }
+                        const parsed = parseQuestion(line);
+                        if (!parsed) {
+                            if (isBlankSet) errors.push(`Line ${absoluteLine + i + 1}: a (tb) question must include a question, a hyphen, and answer parts.`);
+                            continue;
+                        }
+                        if (isBlankSet) {
+                            const blankItems = parseBlankItems(parsed.a);
+                            if (!blankItems) {
+                                errors.push(`Line ${absoluteLine + i + 1}: invalid (tb) syntax. Use 1. (answer) text; 1. leading text (answer) trailing text; or answer. (description);`);
+                                continue;
+                            }
+                            parsed.blankItems = blankItems;
+                            parsed.isBlankSet = true;
+                            parsed.isTyped = true;
+                            parsed.a = blankItems.map(item => item.answer).join(' | ');
+                            questions.push(parsed);
+                        } else {
+                            parsed.isTyped = isTyped;
+                            questions.push(parsed);
+                        }
                     }
                     if (questions.length) {
                         tests.push(questions); names.push(name); modes.push(randMode);
                         removed.push(isRemoved); mc.push(hasMC);
                     }
+                    absoluteLine += lines.length + 1;
                 }
-                return { tests, testNames: names, testModes: modes, testRemoved: removed, testMultipleChoice: mc };
+                return { tests, testNames: names, testModes: modes, testRemoved: removed, testMultipleChoice: mc, errors };
             }
+
             function getDefault() {
                 return {
                     tests: [
@@ -1226,6 +1978,13 @@ random(Multiple Choice Examples)
             let currentTest = null;
             let answeredQuestions = [];
             let score = 0;
+            // Retry-round progression: Round 2 contains Round 1 mistakes, and so on.
+            let sessionKind = 'original';
+            let currentRoundNumber = 1;
+            let sessionQuestionCount = 0;
+            let roundQuestionSets = Object.create(null);
+            let highestRoundUnlocked = 1;
+            let nextRoundToStart = null;
             let startTime = Date.now();
             let timerInterval = null;
             let currentTime = 0;
@@ -1253,6 +2012,9 @@ random(Multiple Choice Examples)
             const editDiv = document.getElementById('editContainer');
             const scoreDiv = document.getElementById('scoreContainer');
             const reviewDiv = document.getElementById('reviewContainer');
+            const roundActionsEl = document.getElementById('roundActions');
+            const roundStatusEl = document.getElementById('roundStatusDisplay');
+            const resultsTitleEl = document.getElementById('resultsTitle');
             const questionEl = document.getElementById('questionText');
             const answerInput = document.getElementById('answerInput');
             const submitBtn = document.getElementById('submitBtn');
@@ -1264,7 +2026,14 @@ random(Multiple Choice Examples)
             const typoContinueContainer = document.getElementById('typoContinueContainer');
             const typoContinueBtn = document.getElementById('typoContinueBtn');
             const notepad = document.getElementById('questionNotepad');
+            const autocompletePanel = document.getElementById('autocompletePanel');
+            let autocompleteSuggestions = [];
+            let autocompleteActiveIndex = 0;
+            notepad.addEventListener('blur', () => window.setTimeout(() => {
+                if (document.activeElement !== notepad) hideAutocomplete();
+            }, 120));
             const optionsContainer = document.getElementById('optionsContainer');
+            const blankAnswersContainer = document.getElementById('blankAnswersContainer');
             const finalScoreEl = document.getElementById('finalScoreDisplay');
             const timeTakenEl = document.getElementById('timeTakenDisplay');
             const averageTimeEl = document.getElementById('averageTimeDisplay');
@@ -1350,7 +2119,11 @@ random(Multiple Choice Examples)
             function autoSpeak(text, fn) {
                 if (!ttsEnabled) { fn(); return; }
                 const t = autoToken;
-                const clean = String(text).replace(/<[^>]*>/g, '').replace(/\$\$[\s\S]*?\$\$/g, '').replace(/\\\([\s\S]*?\\\)/g, '');
+                const clean = String(text)
+                    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt) => alt ? `Image: ${alt}` : 'Image')
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/\$\$[\s\S]*?\$\$/g, '')
+                    .replace(/\\\([\s\S]*?\\\)/g, '');
                 const u = new SpeechSynthesisUtterance(clean);
                 const v = findVoice(ttsVoiceLang);
                 if (v) { u.voice = v; u.lang = v.lang; }
@@ -1377,33 +2150,70 @@ random(Multiple Choice Examples)
                 maticStatus.classList.remove('hidden');
                 autoSpeak(q.q, () => autoWait(() => revealAuto(q, as), ttsEnabled ? pause : qs));
             }
+            function formatBlankItem(item, index, value) {
+                const answer = value === undefined ? item.answer : value;
+                return `${index + 1}. ${item.before ? item.before + ' ' : ''}${answer}${item.after ? ' ' + item.after : ''}`;
+            }
+            function getBlankAnswerSpeech(q) {
+                if (!q || !q.isBlankSet || !Array.isArray(q.blankItems)) return q ? q.a : '';
+                return q.blankItems.map((item, index) => formatBlankItem(item, index)).join('. ');
+            }
+
             function revealAuto(q, as) {
                 autoRevealed = true;
                 const box = document.createElement('div');
                 box.id = 'maticAnswerDisplay';
-                box.style.cssText = 'background:#2e8b57;color:white;padding:15px;border-radius:30px;margin:10px 0;text-align:center;font-size:1.2rem;font-weight:bold;border-left:5px solid #a0ffa0;';
-                renderLatex(box, 'Answer: ' + q.a);
+                box.style.cssText = 'background:var(--success-soft);color:var(--text);padding:15px;border-radius:12px;margin:10px 0;text-align:left;font-size:1rem;font-weight:650;border:1px solid rgba(34,197,94,.4);';
+
+                if (q.isBlankSet && Array.isArray(q.blankItems)) {
+                    const heading = document.createElement('div');
+                    heading.textContent = 'Completed answers';
+                    box.appendChild(heading);
+                    const list = document.createElement('div');
+                    list.className = 'blank-feedback-list';
+                    q.blankItems.forEach((item, index) => {
+                        const row = document.createElement('div');
+                        row.className = 'blank-feedback-row';
+                        const answer = document.createElement('span');
+                        renderLatex(answer, formatBlankItem(item, index));
+                        row.appendChild(answer);
+                        list.appendChild(row);
+                        const input = blankAnswersContainer.querySelector(`[data-blank-index="${index}"]`);
+                        if (input) { input.value = item.answer; input.classList.add('is-correct'); }
+                    });
+                    box.appendChild(list);
+                } else {
+                    renderLatex(box, 'Answer: ' + q.a);
+                    if (currentOptions) {
+                        const i = currentOptions.findIndex(o => o.text === q.a);
+                        const opts = document.querySelectorAll('.option-item');
+                        if (opts[i]) opts[i].classList.add('correct-highlight');
+                    } else {
+                        answerInput.value = q.a;
+                    }
+                }
                 gameDiv.insertBefore(box, maticStatus);
 
-                if (currentOptions) {
-                    const i = currentOptions.findIndex(o => o.text === q.a);
-                    const opts = document.querySelectorAll('.option-item');
-                    if (opts[i]) opts[i].classList.add('correct-highlight');
-                } else {
-                    answerInput.value = q.a;
-                }
                 feedbackBox.className = 'feedback-box';
-                feedbackBox.textContent = 'Correct!';
+                feedbackBox.textContent = q.isBlankSet ? 'All blanks completed correctly by MATIC.' : 'Correct!';
                 feedbackBox.classList.remove('hidden');
                 submitBtn.classList.add('correct-feedback');
                 correctSound.play().catch(() => {});
 
+                const userAnswers = q.isBlankSet ? q.blankItems.map(item => item.answer) : undefined;
                 score++;
-                answeredQuestions.push({ ...q, userAnswer: q.a, isCorrect: true, time: currentTime, testId: currentTest.originalId });
+                answeredQuestions.push({
+                    ...q,
+                    userAnswer: q.isBlankSet ? userAnswers.join(' | ') : q.a,
+                    ...(q.isBlankSet ? { userAnswers, blankResults: q.blankItems.map(item => ({ userAnswer: item.answer, correctAnswer: item.answer, match: true, isTypo: false })) } : {}),
+                    isCorrect: true,
+                    time: currentTime,
+                    testId: currentTest.originalId
+                });
                 currentTest.currentIndex++;
 
                 maticStatus.innerHTML = ttsEnabled ? 'Reading answer...' : `MATIC is showing the answer<br>Moving to the next question in ${as / 1000} seconds...`;
-                autoSpeak('The answer is ' + q.a, () => autoWait(advanceAuto, ttsEnabled ? 800 : as));
+                autoSpeak('The answer is ' + getBlankAnswerSpeech(q), () => autoWait(advanceAuto, ttsEnabled ? 800 : as));
             }
             function advanceAuto() {
                 clearAuto();
@@ -1491,6 +2301,47 @@ random(Multiple Choice Examples)
             }
 
             // ============================================================
+            // TYPED BLANKS RENDERING
+            // ============================================================
+            function renderBlankInputs(q) {
+                blankAnswersContainer.innerHTML = '';
+                (q.blankItems || []).forEach((item, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'blank-answer-row';
+
+                    const number = document.createElement('span');
+                    number.className = 'blank-number';
+                    number.textContent = `${index + 1}.`;
+
+                    const before = document.createElement('span');
+                    before.className = 'blank-answer-before';
+                    renderLatex(before, item.before || '');
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'blank-answer-input';
+                    input.dataset.blankIndex = String(index);
+                    input.autocomplete = 'off';
+                    input.spellcheck = false;
+                    input.placeholder = 'Your answer';
+                    input.setAttribute('aria-label', `Answer for blank ${index + 1}`);
+                    input.addEventListener('input', resetError);
+                    input.addEventListener('keydown', event => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            forceCheckAnswer();
+                        }
+                    });
+
+                    const tail = document.createElement('span');
+                    tail.className = 'blank-answer-tail';
+                    renderLatex(tail, item.after || '');
+                    row.append(number, before, input, tail);
+                    blankAnswersContainer.appendChild(row);
+                });
+            }
+
+            // ============================================================
             // LOAD QUESTION
             // ============================================================
             function loadQuestion() {
@@ -1504,12 +2355,24 @@ random(Multiple Choice Examples)
                 awaitingTypoContinue = false;
                 typoContinueResolve = null;
 
-                if (currentTest.isMC && !q.isTyped) {
+                if (q.isBlankSet) {
+                    currentOptions = null;
+                    optionsContainer.classList.add('hidden');
+                    answerInput.classList.add('hidden');
+                    blankAnswersContainer.classList.remove('hidden');
+                    renderBlankInputs(q);
+                    if (!maticMode) {
+                        const firstBlank = blankAnswersContainer.querySelector('input');
+                        if (firstBlank) setTimeout(() => firstBlank.focus(), 100);
+                    }
+                } else if (currentTest.isMC && !q.isTyped) {
+                    blankAnswersContainer.classList.add('hidden');
                     currentOptions = generateOptions(q, currentTest.questions);
                     displayOptions(currentOptions);
                     answerInput.classList.add('hidden');
                     optionsContainer.classList.remove('hidden');
                 } else {
+                    blankAnswersContainer.classList.add('hidden');
                     currentOptions = null;
                     optionsContainer.classList.add('hidden');
                     answerInput.classList.remove('hidden');
@@ -1518,7 +2381,7 @@ random(Multiple Choice Examples)
                 }
                 isSubmitting = false;
                 selectedOptionIndex = -1;
-                const total = originalQuestions.filter(x => !testRemoved[x.testId]).length;
+                const total = sessionQuestionCount || getOriginalQuestionCount();
                 progressDisplay.innerText = `${answeredQuestions.length} of ${total} answered`;
                 testProgress.innerText = `Question ${currentTest.currentIndex + 1} of ${currentTest.questions.length}`;
                 if (maticMode) runAutoCycle();
@@ -1531,6 +2394,10 @@ random(Multiple Choice Examples)
                 if (isSubmitting || !currentTest || maticMode) return;
                 const q = currentTest.questions[currentTest.currentIndex];
                 if (!q) return;
+                if (q.isBlankSet) {
+                    submitBlankSetAnswer(q);
+                    return;
+                }
                 const userAnswer = answerInput.value.trim();
                 if (!userAnswer) {
                     emptyAnswerError.textContent = 'Please enter an answer before submitting.';
@@ -1579,6 +2446,102 @@ random(Multiple Choice Examples)
                     setTimeout(advance, 2000);
                 }
             }
+            function submitBlankSetAnswer(q) {
+                const inputs = Array.from(blankAnswersContainer.querySelectorAll('.blank-answer-input'));
+                if (!inputs.length || inputs.length !== q.blankItems.length) {
+                    emptyAnswerError.textContent = 'The blank fields could not be loaded. Please reload this question.';
+                    emptyAnswerError.classList.add('visible');
+                    return;
+                }
+
+                isSubmitting = true;
+                const userAnswers = inputs.map(input => input.value.trim());
+                const blankResults = q.blankItems.map((item, index) => {
+                    const result = fuzzyMatch(userAnswers[index] || '', item.answer);
+                    return {
+                        userAnswer: userAnswers[index],
+                        correctAnswer: item.answer,
+                        match: result.match,
+                        isTypo: result.isTypo
+                    };
+                });
+                const isCorrect = blankResults.every(result => result.match);
+                const hasTypo = isCorrect && blankResults.some(result => result.isTypo);
+                inputs.forEach((input, index) => {
+                    input.classList.remove('is-correct', 'is-wrong');
+                    input.classList.add(blankResults[index].match ? 'is-correct' : 'is-wrong');
+                });
+
+                const userAnswer = userAnswers.join(' | ');
+                answeredQuestions.push({
+                    ...q,
+                    userAnswer,
+                    userAnswers: [...userAnswers],
+                    blankResults,
+                    isCorrect,
+                    time: currentTime,
+                    testId: currentTest.originalId
+                });
+
+                const advance = () => {
+                    currentTest.currentIndex++;
+                    if (currentTest.currentIndex >= currentTest.questions.length) loadNextTest();
+                    else loadQuestion();
+                };
+
+                feedbackBox.innerHTML = '';
+                const heading = document.createElement('div');
+                heading.textContent = isCorrect
+                    ? (hasTypo ? 'All blanks are correct. Minor spelling differences were accepted.' : 'All blanks are correct!')
+                    : 'Some blanks are incorrect. Check the correct answers below:';
+                feedbackBox.appendChild(heading);
+                const list = document.createElement('div');
+                list.className = 'blank-feedback-list';
+                blankResults.forEach((result, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'blank-feedback-row';
+                    const userLine = document.createElement('div');
+                    const userLabel = document.createElement('strong');
+                    userLabel.textContent = 'Your answer: ';
+                    const userValue = document.createElement('span');
+                    renderLatex(userValue, formatBlankItem(q.blankItems[index], index, result.userAnswer || '(blank)'));
+                    userLine.append(userLabel, userValue);
+                    const correctLine = document.createElement('div');
+                    correctLine.style.marginTop = '3px';
+                    const correctLabel = document.createElement('strong');
+                    correctLabel.textContent = 'Correct answer: ';
+                    const correctValue = document.createElement('span');
+                    renderLatex(correctValue, formatBlankItem(q.blankItems[index], index, result.correctAnswer));
+                    correctLine.append(correctLabel, correctValue);
+                    row.append(userLine, correctLine);
+                    list.appendChild(row);
+                });
+                feedbackBox.appendChild(list);
+
+                if (isCorrect) {
+                    score++;
+                    correctSound.play().catch(() => {});
+                    feedbackBox.className = hasTypo ? 'feedback-box typo' : 'feedback-box';
+                    submitBtn.classList.add(hasTypo ? 'typo-feedback' : 'correct-feedback');
+                    feedbackBox.classList.remove('hidden');
+                    if (hasTypo) {
+                        typoContinueContainer.classList.remove('hidden');
+                        waitForTypoContinue().then(() => {
+                            typoContinueContainer.classList.add('hidden');
+                            advance();
+                        });
+                    } else {
+                        setTimeout(advance, 650);
+                    }
+                } else {
+                    incorrectSound.play().catch(() => {});
+                    feedbackBox.className = 'feedback-box wrong';
+                    submitBtn.classList.add('wrong-feedback');
+                    feedbackBox.classList.remove('hidden');
+                    setTimeout(advance, 2500);
+                }
+            }
+
             function forceCheckAnswer() {
                 if (maticMode) return;
                 if (awaitingTypoContinue) {
@@ -1740,28 +2703,46 @@ random(Multiple Choice Examples)
                         }
                     }
                     test.forEach((q, j) => {
-                        let line = `${j+1}. ${q.q} - ${q.a}`;
-                        if (q.isTyped) line = `(t)${line}`;
+                        let line;
+                        if (q.isBlankSet && Array.isArray(q.blankItems)) {
+                            const parts = q.blankItems.map((item, index) => `${index + 1}. ${item.before ? item.before + ' ' : ''}(${item.answer})${item.after ? ' ' + item.after : ''}`);
+                            line = `(tb)${j + 1}. ${q.q} - ${parts.join('; ')};`;
+                        } else {
+                            line = `${j + 1}. ${q.q} - ${q.a}`;
+                            if (q.isTyped) line = `(t)${line}`;
+                        }
                         lines.push(line);
                     });
                     if (i < tests.length - 1) lines.push('');
                 });
                 notepad.value = lines.join('\n');
-                autoSaveNotepad();
                 updateLivePreview();
+            }
+            function editorDraftKey() {
+                return currentSubject === 'local' ? 'quiz_notepad_draft_local' : 'quiz_notepad_draft_' + currentSubject;
             }
             function autoSaveNotepad() {
                 const content = notepad.value;
-                localStorage.setItem('quiz_notepad_backup', content);
+                try {
+                    localStorage.setItem(editorDraftKey(), content);
+                    localStorage.setItem('quiz_notepad_backup', content); // Keep the legacy backup key for compatibility.
+                } catch (error) {
+                    if (autoSaveStatus) autoSaveStatus.textContent = 'Draft could not be saved. Export your question set to back it up.';
+                    return;
+                }
                 if (autoSaveStatus) {
-                    autoSaveStatus.textContent = 'Auto-saved';
-                    autoSaveStatus.style.color = '#2e8b57';
+                    autoSaveStatus.textContent = 'Draft auto-saved';
+                    autoSaveStatus.style.color = '#22c55e';
                     setTimeout(() => { if (autoSaveStatus) autoSaveStatus.textContent = 'Auto-saving enabled'; }, 1500);
                 }
             }
             function loadAutoSavedNotepad() {
-                const saved = localStorage.getItem('quiz_notepad_backup');
-                if (saved) { notepad.value = saved; updateLivePreview(); }
+                let saved = null;
+                try { saved = localStorage.getItem(editorDraftKey()); } catch {}
+                if (saved === null) return false;
+                notepad.value = saved;
+                updateLivePreview();
+                return true;
             }
             function prepareQuestions(test, id) {
                 const qs = [...test];
@@ -1778,18 +2759,16 @@ random(Multiple Choice Examples)
                 }
             }
 
-            function resetGame() {
+            function getOriginalQuestionCount() {
+                return originalQuestions.filter(q => !testRemoved[q.testId]).length;
+            }
+
+            function resetAttemptUI(questionCount) {
                 if (maticMode) stopMaticMode();
                 if (ttsEnabled) disableTTS();
                 clearAuto();
                 autoRevealed = false;
 
-                const all = tests.map((t, id) => ({
-                    questions: [...t], originalId: id, name: getTestName(id, id),
-                    removed: testRemoved[id], isMC: testMultipleChoice[id]
-                })).filter(t => !t.removed);
-
-                remainingTests = shuffle([...all]);
                 completedTests = [];
                 currentTest = null;
                 answeredQuestions = [];
@@ -1804,8 +2783,11 @@ random(Multiple Choice Examples)
                 typoContinueResolve = null;
                 stopTimer();
                 currentTime = 0;
+                sessionQuestionCount = questionCount;
                 updateTimer();
                 startTimer();
+
+                setFocusMode(false);
                 gameDiv.classList.remove('hidden');
                 editDiv.classList.add('hidden');
                 scoreDiv.classList.add('hidden');
@@ -1821,9 +2803,81 @@ random(Multiple Choice Examples)
                 timerControls2.style.opacity = '1';
                 timerControls2.style.pointerEvents = 'auto';
                 optionsContainer.classList.add('hidden');
+                blankAnswersContainer.classList.add('hidden');
                 answerInput.classList.remove('hidden');
+                if (roundActionsEl) roundActionsEl.innerHTML = '';
+            }
+
+            function resetGame() {
+                // A full original retry starts a fresh progression from Round 1.
+                sessionKind = 'original';
+                currentRoundNumber = 1;
+                roundQuestionSets = Object.create(null);
+                highestRoundUnlocked = 1;
+                nextRoundToStart = null;
+
+                const all = tests.map((t, id) => ({
+                    questions: [...t], originalId: id, name: getTestName(id, id),
+                    removed: testRemoved[id], isMC: testMultipleChoice[id]
+                })).filter(t => !t.removed);
+
+                remainingTests = shuffle([...all]);
+                resetAttemptUI(getOriginalQuestionCount());
                 if (remainingTests.length) loadNextTest();
                 else alert('No active tests!');
+            }
+
+            function startRound(roundNumber) {
+                const selectedQuestions = roundQuestionSets[roundNumber];
+                if (!Array.isArray(selectedQuestions) || selectedQuestions.length === 0) return;
+
+                sessionKind = 'round';
+                currentRoundNumber = roundNumber;
+                nextRoundToStart = null;
+
+                // Keep each missed question associated with its original test so its
+                // multiple-choice/typed-answer mode and review label stay correct.
+                const grouped = new Map();
+                selectedQuestions.forEach(question => {
+                    const testId = Number.isInteger(Number(question.testId)) ? Number(question.testId) : 0;
+                    if (!grouped.has(testId)) {
+                        grouped.set(testId, {
+                            questions: [],
+                            originalId: testId,
+                            name: getTestName(testId, testId),
+                            isMC: !!testMultipleChoice[testId]
+                        });
+                    }
+                    grouped.get(testId).questions.push({
+                        q: question.q,
+                        a: question.a,
+                        isTyped: !!question.isTyped,
+                        isBlankSet: !!question.isBlankSet,
+                        blankItems: Array.isArray(question.blankItems) ? question.blankItems.map(item => ({ ...item })) : undefined,
+                        testId
+                    });
+                });
+
+                remainingTests = shuffle(Array.from(grouped.values()));
+                resetAttemptUI(selectedQuestions.length);
+                if (remainingTests.length) loadNextTest();
+                else finalizeScore();
+            }
+
+            function updateRoundActionButtons() {
+                if (!roundActionsEl) return;
+                roundActionsEl.innerHTML = '';
+
+                for (let round = 2; round <= highestRoundUnlocked; round++) {
+                    if (!roundQuestionSets[round] || roundQuestionSets[round].length === 0) continue;
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = round === nextRoundToStart ? 'primary-button' : '';
+                    button.textContent = round === nextRoundToStart ? `Round ${round}` : `Round ${round} again`;
+                    button.setAttribute('aria-label', round === nextRoundToStart ? `Start Round ${round}` : `Retry Round ${round}`);
+                    button.addEventListener('click', () => startRound(round));
+                    roundActionsEl.appendChild(button);
+                }
             }
 
             function loadNextTest() {
@@ -1860,18 +2914,90 @@ random(Multiple Choice Examples)
                 setFocusMode(false);
                 gameDiv.classList.add('hidden');
                 scoreDiv.classList.remove('hidden');
+
                 const total = currentTime;
-                const mins = Math.floor(total/60);
-                const secs = total%60;
+                const mins = Math.floor(total / 60);
+                const secs = total % 60;
+                const totalQ = sessionQuestionCount || getOriginalQuestionCount();
+                const wrongAnswers = answeredQuestions
+                    .filter(answer => !answer.isCorrect)
+                    .map(answer => {
+                        // For a typed-blank question, retry only the individual blanks
+                        // that were missed, while keeping the original question prompt.
+                        if (answer.isBlankSet && Array.isArray(answer.blankItems) && Array.isArray(answer.blankResults)) {
+                            const missedItems = answer.blankItems.filter((item, index) => !answer.blankResults[index]?.match);
+                            return {
+                                q: answer.q,
+                                a: missedItems.map(item => item.answer).join(' | '),
+                                isTyped: true,
+                                isBlankSet: true,
+                                blankItems: missedItems.map(item => ({ ...item })),
+                                testId: answer.testId
+                            };
+                        }
+                        return {
+                            q: answer.q,
+                            a: answer.a,
+                            isTyped: !!answer.isTyped,
+                            isBlankSet: !!answer.isBlankSet,
+                            blankItems: Array.isArray(answer.blankItems) ? answer.blankItems.map(item => ({ ...item })) : undefined,
+                            testId: answer.testId
+                        };
+                    });
+
+                // Rebuild only the next round from the mistakes in the round just
+                // completed. Any later rounds are discarded if an earlier round is replayed.
+                if (sessionKind === 'original') {
+                    roundQuestionSets = Object.create(null);
+                    highestRoundUnlocked = 1;
+                    nextRoundToStart = null;
+                } else {
+                    Object.keys(roundQuestionSets).forEach(key => {
+                        if (Number(key) > currentRoundNumber) delete roundQuestionSets[key];
+                    });
+                    highestRoundUnlocked = currentRoundNumber;
+                    nextRoundToStart = null;
+                }
+
+                if (wrongAnswers.length > 0 && currentRoundNumber < 5) {
+                    const nextRound = currentRoundNumber + 1;
+                    roundQuestionSets[nextRound] = wrongAnswers;
+                    highestRoundUnlocked = nextRound;
+                    nextRoundToStart = nextRound;
+                }
+
+                if (resultsTitleEl) {
+                    resultsTitleEl.textContent = sessionKind === 'original'
+                        ? 'Original test completed'
+                        : `Round ${currentRoundNumber} completed`;
+                }
+
                 timeTakenEl.innerHTML = `<span class="results-stat-label">Time taken</span>${mins}m ${secs}s`;
-                const totalQ = originalQuestions.filter((_, i) => !testRemoved[originalQuestions[i].testId]).length;
-                const avg = total / totalQ;
-                const avgM = Math.floor(avg/60);
-                const avgS = Math.floor(avg%60);
+                const avg = totalQ > 0 ? total / totalQ : 0;
+                const avgM = Math.floor(avg / 60);
+                const avgS = Math.floor(avg % 60);
                 averageTimeEl.innerHTML = `<span class="results-stat-label">Average per question</span>${avgM > 0 ? avgM + 'm ' : ''}${avgS}s`;
-                const active = tests.filter((_, i) => !testRemoved[i]).length;
-                testsCompletedEl.innerHTML = `<span class="results-stat-label">Tests completed</span>${completedTests.length} of ${active}`;
+
+                if (sessionKind === 'original') {
+                    const active = tests.filter((_, i) => !testRemoved[i]).length;
+                    testsCompletedEl.innerHTML = `<span class="results-stat-label">Tests completed</span>${completedTests.length} of ${active}`;
+                } else {
+                    testsCompletedEl.innerHTML = `<span class="results-stat-label">Questions completed</span>${answeredQuestions.length} of ${totalQ}`;
+                }
                 finalScoreEl.innerText = `${score}/${totalQ}`;
+
+                if (roundStatusEl) {
+                    if (wrongAnswers.length === 0) {
+                        roundStatusEl.textContent = currentRoundNumber === 1
+                            ? 'Perfect score! You have no missed questions, so no retry round is needed.'
+                            : `Perfect Round ${currentRoundNumber}! You cleared every question, so there is no next round.`;
+                    } else if (currentRoundNumber < 5) {
+                        roundStatusEl.textContent = `${wrongAnswers.length} question${wrongAnswers.length === 1 ? '' : 's'} missed. Round ${currentRoundNumber + 1} will contain only these questions.`;
+                    } else {
+                        roundStatusEl.textContent = `${wrongAnswers.length} question${wrongAnswers.length === 1 ? '' : 's'} missed. Round 5 is the final retry round.`;
+                    }
+                }
+                updateRoundActionButtons();
             }
             function showReview() {
                 scoreDiv.classList.add('hidden');
@@ -1891,7 +3017,46 @@ random(Multiple Choice Examples)
                     const secs = q.time % 60;
                     const name = getTestName(q.testId, q.testId);
                     const mode = testModes[q.testId] ? 'Randomized' : 'In order';
-                    const mc = testMultipleChoice[q.testId] ? 'Multiple choice' : 'Typed answer';
+                    const mc = q.isBlankSet ? 'Fill in the blanks' : (testMultipleChoice[q.testId] ? 'Multiple choice' : 'Typed answer');
+                    if (q.isBlankSet && Array.isArray(q.blankItems)) {
+                        const questionP = document.createElement('p');
+                        questionP.className = 'review-question';
+                        const questionSpan = document.createElement('span');
+                        renderLatex(questionSpan, q.q);
+                        questionP.appendChild(questionSpan);
+                        div.appendChild(questionP);
+
+                        const blankReview = document.createElement('div');
+                        blankReview.className = 'blank-feedback-list';
+                        q.blankItems.forEach((item, index) => {
+                            const row = document.createElement('div');
+                            row.className = 'blank-feedback-row';
+                            const result = Array.isArray(q.blankResults) ? q.blankResults[index] : null;
+                            const given = Array.isArray(q.userAnswers) ? q.userAnswers[index] : (result ? result.userAnswer : '');
+                            const givenLine = document.createElement('div');
+                            const givenLabel = document.createElement('strong');
+                            givenLabel.textContent = 'Your answer: ';
+                            const givenValue = document.createElement('span');
+                            renderLatex(givenValue, formatBlankItem(item, index, given || '(blank)'));
+                            givenLine.append(givenLabel, givenValue);
+                            const correctLine = document.createElement('div');
+                            correctLine.style.marginTop = '3px';
+                            const correctLabel = document.createElement('strong');
+                            correctLabel.textContent = 'Correct answer: ';
+                            const correctValue = document.createElement('span');
+                            renderLatex(correctValue, formatBlankItem(item, index, item.answer));
+                            correctLine.append(correctLabel, correctValue);
+                            row.append(givenLine, correctLine);
+                            blankReview.appendChild(row);
+                        });
+                        div.appendChild(blankReview);
+                        const meta = document.createElement('p');
+                        meta.className = 'review-meta';
+                        meta.textContent = `${mins > 0 ? mins + 'm ' : ''}${secs}s · ${name} · ${mc} · ${mode}`;
+                        div.appendChild(meta);
+                        reviewListEl.appendChild(div);
+                        return;
+                    }
                     const questionSpan = document.createElement('span');
                     renderLatex(questionSpan, q.q);
                     const answerSpan = document.createElement('span');
@@ -1930,21 +3095,317 @@ random(Multiple Choice Examples)
             }
 
             // ============================================================
+            // QUESTION EDITOR AUTOCOMPLETE
+            // ============================================================
+            function getEditorCategoryNames() {
+                const found = new Set();
+                // Keep the last successfully loaded names available while the user is
+                // editing an incomplete `random(` command in the textarea.
+                (Array.isArray(testNames) ? testNames : []).forEach(name => {
+                    const clean = String(name || '').trim();
+                    if (clean && !/^random\s*\(/i.test(clean)) found.add(clean);
+                });
+                try {
+                    const parsed = parseNotepad(notepad.value);
+                    (parsed.testNames || []).forEach(name => {
+                        const clean = String(name || '').trim();
+                        if (clean && !/^random\s*\(/i.test(clean)) found.add(clean);
+                    });
+                } catch (error) {
+                    console.warn('Could not read editor category names for autocomplete:', error);
+                }
+                return [...found];
+            }
+
+            function hideAutocomplete() {
+                if (!autocompletePanel) return;
+                autocompletePanel.classList.remove('visible');
+                autocompletePanel.innerHTML = '';
+                autocompleteSuggestions = [];
+                autocompleteActiveIndex = 0;
+                notepad.removeAttribute('aria-activedescendant');
+                notepad.setAttribute('aria-expanded', 'false');
+            }
+
+            function renderAutocomplete(suggestions) {
+                autocompleteSuggestions = suggestions;
+                autocompleteActiveIndex = 0;
+                autocompletePanel.innerHTML = '';
+                if (!suggestions.length) { hideAutocomplete(); return; }
+
+                suggestions.forEach((item, index) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'autocomplete-item' + (index === 0 ? ' active' : '');
+                    button.id = `autocomplete-option-${index}`;
+                    button.setAttribute('role', 'option');
+                    button.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+                    button.addEventListener('pointerdown', event => event.preventDefault());
+                    button.addEventListener('click', () => insertAutocompleteSuggestion(index));
+
+                    const copy = document.createElement('span');
+                    copy.className = 'autocomplete-copy';
+                    const label = document.createElement('span');
+                    label.className = 'autocomplete-label';
+                    label.textContent = item.label;
+                    const description = document.createElement('span');
+                    description.className = 'autocomplete-description';
+                    description.textContent = item.description;
+                    copy.append(label, description);
+
+                    const kind = document.createElement('span');
+                    kind.className = 'autocomplete-kind';
+                    kind.textContent = item.kind;
+                    button.append(copy, kind);
+                    autocompletePanel.appendChild(button);
+                });
+
+                const hint = document.createElement('div');
+                hint.className = 'autocomplete-hint';
+                hint.textContent = '↑ ↓ Navigate · Enter / Tab Insert · Esc Close';
+                autocompletePanel.appendChild(hint);
+                autocompletePanel.classList.add('visible');
+                notepad.setAttribute('aria-expanded', 'true');
+                notepad.setAttribute('aria-activedescendant', 'autocomplete-option-0');
+            }
+
+            // Question templates use formats already supported by parseNotepad().
+            // After insertion, the question placeholder is selected for immediate replacement.
+            const questionEditorTemplates = [
+                {
+                    id: 'standard', label: 'Standard question', kind: 'Template',
+                    description: 'A regular question with its answer after the spaced hyphen',
+                    insertText: '1. Question - answer', selectStart: 3, selectLength: 8
+                },
+                {
+                    id: 'typed', label: 'Typed-answer question', kind: 'Template',
+                    description: 'Require the learner to type the answer',
+                    insertText: '(t)1. Question - answer', selectStart: 6, selectLength: 8
+                },
+                {
+                    id: 'blanks-numbered', label: 'Typed blanks · numbered', kind: 'Template',
+                    description: 'Create multiple numbered blanks in one question',
+                    insertText: '(tb)1. Question - 1. (answer); 2. (answer);', selectStart: 7, selectLength: 8
+                },
+                {
+                    id: 'blanks-sentence', label: 'Typed blanks · sentence style', kind: 'Template',
+                    description: 'Place blanks inside a sentence with text before and after',
+                    insertText: '(tb)1. Question - 1. Before (answer) after;', selectStart: 7, selectLength: 8
+                },
+                {
+                    id: 'multiple-choice', label: 'Multiple-choice test set', kind: 'Template',
+                    description: 'Start a named question set using BAOspace multiple-choice mode',
+                    insertText: '\n\n"Test Name"\nmultiple.cho()\n1. Question - answer\n\n',
+                    selectStart: '\n\n"Test Name"\nmultiple.cho()\n1. '.length, selectLength: 8
+                },
+                {
+                    id: 'image', label: 'Image-based question', kind: 'Template',
+                    description: 'Add an image-library reference to a standard question',
+                    insertText: '1. Question ![Image description](baospace-image:IMAGE_ID) - answer',
+                    selectStart: 3, selectLength: 8
+                }
+            ];
+
+            function openQuestionTemplates() {
+                if (!notepad || !autocompletePanel) return;
+                const start = notepad.selectionStart ?? notepad.value.length;
+                const end = notepad.selectionEnd ?? start;
+                renderAutocomplete(questionEditorTemplates.map(template => ({
+                    ...template, replaceStart: start, replaceEnd: end
+                })));
+                // Return focus to the source editor so arrow keys, Enter, Tab, and Esc
+                // continue to work when the template menu was opened with its button.
+                notepad.focus({ preventScroll: true });
+            }
+
+            function addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, filter = () => true) {
+                questionEditorTemplates.filter(filter).forEach(template => {
+                    suggestions.push({ ...template, replaceStart, replaceEnd });
+                });
+            }
+
+            function updateAutocomplete() {
+                if (!notepad || !autocompletePanel || document.activeElement !== notepad) return;
+                const caret = notepad.selectionStart;
+                const beforeCaret = notepad.value.slice(0, caret);
+                const lineStart = beforeCaret.lastIndexOf('\n') + 1;
+                const currentLine = beforeCaret.slice(lineStart);
+                const categories = getEditorCategoryNames();
+                const suggestions = [];
+
+                // Inside random(...), offer real category/test names from this editor.
+                const randomContext = currentLine.match(/\brandom\s*\(\s*([^)]*)$/i);
+                if (randomContext) {
+                    const query = randomContext[1].trim().toLowerCase();
+                    const replaceStart = lineStart + randomContext.index;
+                    const matchingNames = categories.filter(name => !query || name.toLowerCase().includes(query));
+                    matchingNames.slice(0, 8).forEach(name => suggestions.push({
+                        label: `random(${name})`,
+                        description: 'Randomize the questions in this existing question set',
+                        kind: 'Function',
+                        insertText: `random(${name})`,
+                        replaceStart,
+                        replaceEnd: caret
+                    }));
+                    if (!matchingNames.length) suggestions.push({
+                        label: 'random(Category Name)',
+                        description: 'Randomize a question set; replace Category Name with its exact title',
+                        kind: 'Function',
+                        insertText: 'random(Category Name)',
+                        replaceStart,
+                        replaceEnd: caret,
+                        cursorOffset: 'random('.length + 'Category Name'.length
+                    });
+                    renderAutocomplete(suggestions);
+                    return;
+                }
+
+                // Image markdown helper: trigger after the user starts an image tag.
+                const imageContext = currentLine.match(/!\[[^\]]*$/);
+                if (imageContext) {
+                    suggestions.push({
+                        label: '![alt text](baospace-image:IMAGE_ID)',
+                        description: 'Insert an image-library reference; change the alt text and image ID',
+                        kind: 'Image',
+                        insertText: '![alt text](baospace-image:IMAGE_ID)',
+                        replaceStart: lineStart + imageContext.index,
+                        replaceEnd: caret,
+                        selectStart: 2,
+                        selectLength: 8
+                    });
+                    renderAutocomplete(suggestions);
+                    return;
+                }
+
+                const tokenMatch = currentLine.match(/[A-Za-z0-9_.()!-]+$/);
+                if (!tokenMatch) { hideAutocomplete(); return; }
+                const token = tokenMatch[0];
+                const query = token.toLowerCase();
+                const replaceStart = caret - token.length;
+                const replaceEnd = caret;
+                const add = (item) => suggestions.push({ ...item, replaceStart, replaceEnd });
+
+                if ('multiple.cho()'.startsWith(query) || query.startsWith('mult') || query.startsWith('multiple.cho')) {
+                    add({ label: 'multiple.cho()', description: 'Enable multiple-choice mode for this question set', kind: 'Keyword', insertText: 'multiple.cho()' });
+                }
+                if ('random(Category Name)'.toLowerCase().startsWith(query) || query === 'rand' || query === 'random') {
+                    const name = categories[0] || 'Category Name';
+                    add({
+                        label: `random(${name})`,
+                        description: categories.length ? 'Randomize a question set using one of its existing names' : 'Randomize a question set; replace the placeholder with its title',
+                        kind: 'Function',
+                        insertText: `random(${name})`
+                    });
+                    categories.slice(1, 6).forEach(category => add({
+                        label: `random(${category})`,
+                        description: 'Randomize the questions in this existing question set',
+                        kind: 'Function',
+                        insertText: `random(${category})`
+                    }));
+                }
+                if ('(t)'.startsWith(query) || query === '(t') {
+                    add({ label: '(t)', description: 'Mark this as a typed-answer question', kind: 'Keyword', insertText: '(t)' });
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, template => template.id === 'typed');
+                }
+                if ('(tb)'.startsWith(query) || query === '(tb' || query === '(t') {
+                    add({ label: '(tb)', description: 'Start a typed-blanks question with one or more numbered blanks', kind: 'Keyword', insertText: '(tb)' });
+                    if (query === '(tb' || query === '(t') {
+                        addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, template => template.id.startsWith('blanks-'));
+                    }
+                }
+                if (('question'.startsWith(query) && query.length >= 2) || query === 'standard') {
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, template => template.id === 'standard' || template.id === 'typed');
+                }
+                if ('template'.startsWith(query) && query.length >= 3) {
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd);
+                }
+                if (['typed', 'blank', 'blanks'].some(word => word.startsWith(query) || query.startsWith(word))) {
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd,
+                        template => template.id === 'typed' || template.id.startsWith('blanks-'));
+                }
+                if (['sentence', 'sent'].some(word => word.startsWith(query) || query.startsWith(word))) {
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, template => template.id === 'blanks-sentence');
+                }
+                if (['image', 'img'].some(word => word.startsWith(query) || query.startsWith(word))) {
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, template => template.id === 'image');
+                }
+                if (query === 'mult' || query === 'multiple') {
+                    addQuestionTemplateSuggestions(suggestions, replaceStart, replaceEnd, template => template.id === 'multiple-choice');
+                }
+
+                renderAutocomplete(suggestions);
+            }
+
+            function setAutocompleteActive(index) {
+                if (!autocompleteSuggestions.length) return;
+                autocompleteActiveIndex = (index + autocompleteSuggestions.length) % autocompleteSuggestions.length;
+                autocompletePanel.querySelectorAll('.autocomplete-item').forEach((button, i) => {
+                    const active = i === autocompleteActiveIndex;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-selected', active ? 'true' : 'false');
+                });
+                notepad.setAttribute('aria-activedescendant', `autocomplete-option-${autocompleteActiveIndex}`);
+                const activeButton = autocompletePanel.querySelector(`#autocomplete-option-${autocompleteActiveIndex}`);
+                if (activeButton) activeButton.scrollIntoView({ block: 'nearest' });
+            }
+
+            function insertAutocompleteSuggestion(index) {
+                const item = autocompleteSuggestions[index];
+                if (!item) return;
+                const start = item.replaceStart ?? notepad.selectionStart;
+                const end = item.replaceEnd ?? notepad.selectionEnd;
+                const value = notepad.value;
+                notepad.value = value.slice(0, start) + item.insertText + value.slice(end);
+                const caret = start + (item.cursorOffset ?? item.insertText.length);
+                notepad.focus();
+                if (item.selectLength) {
+                    notepad.setSelectionRange(start + (item.selectStart || 0), start + (item.selectStart || 0) + item.selectLength);
+                } else {
+                    notepad.setSelectionRange(caret, caret);
+                }
+                hideAutocomplete();
+                updateLivePreview();
+                autoSaveNotepad();
+            }
+
+            function handleAutocompleteKeydown(event) {
+                if (!autocompleteSuggestions.length || !autocompletePanel.classList.contains('visible')) {
+                    if (event.key === 'Escape') hideAutocomplete();
+                    return;
+                }
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    setAutocompleteActive(autocompleteActiveIndex + 1);
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    setAutocompleteActive(autocompleteActiveIndex - 1);
+                } else if (event.key === 'Enter' || event.key === 'Tab') {
+                    event.preventDefault();
+                    insertAutocompleteSuggestion(autocompleteActiveIndex);
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    hideAutocomplete();
+                }
+            }
+
+            // ============================================================
             // EDITOR
             // ============================================================
             function toggleEditor() {
                 if (editDiv.classList.contains('hidden')) {
-                    updateNotepad();
+                    if (!loadAutoSavedNotepad()) updateNotepad();
                     gameDiv.classList.add('hidden');
                     scoreDiv.classList.add('hidden');
                     reviewDiv.classList.add('hidden');
                     editDiv.classList.remove('hidden');
+                    updateAutocomplete();
                     instructionsDropdown.classList.remove('show');
                     dropdownHeader.classList.remove('open');
                     if (maticMode) stopMaticMode();
                     if (ttsEnabled) disableTTS();
                     stopTimer();
                 } else {
+                    hideAutocomplete();
                     editDiv.classList.add('hidden');
                     gameDiv.classList.remove('hidden');
                     if (remainingTests.length || (currentTest && currentTest.currentIndex < currentTest.questions.length)) startTimer();
@@ -1952,11 +3413,16 @@ random(Multiple Choice Examples)
             }
             function parseAndSaveNotepad() {
                 const parsed = parseNotepad(notepad.value);
+                if (parsed.errors && parsed.errors.length) {
+                    alert('Please fix the following typed-blanks formatting issue(s):\n\n' + parsed.errors.join('\n'));
+                    return;
+                }
                 tests = parsed.tests; testNames = parsed.testNames; testModes = parsed.testModes;
                 testRemoved = parsed.testRemoved; testMultipleChoice = parsed.testMultipleChoice;
                 originalQuestions = [];
                 tests.forEach((t, id) => t.forEach(q => originalQuestions.push({ ...q, testId: id })));
                 saveAndRestart();
+                try { localStorage.removeItem(editorDraftKey()); } catch {}
                 toggleEditor();
             }
             function saveAndRestart() {
@@ -2000,9 +3466,20 @@ random(Multiple Choice Examples)
                     if (!r.ok) throw new Error('missing');
                     d = await r.json();
                 }
+                d = await restoreImageBundle(d);
                 applyData(d);
             }
             async function bootstrap() {
+                try {
+                    await loadImageLibrary();
+                } catch (imageError) {
+                    console.warn('BAOspace image library could not be loaded:', imageError);
+                    const status = document.getElementById('imageStorageStatus');
+                    if (status) status.textContent = 'Image storage is unavailable in this browser context. Use a supported browser origin and try again.';
+                }
+                // The editor performs an initial preview before async IndexedDB loading.
+                // Refresh it now so local baospace-image references resolve immediately.
+                updateLivePreview();
                 try {
                     const r = await fetch('data/index.json?v=' + Date.now());
                     if (!r.ok) throw new Error('no manifest');
@@ -2027,31 +3504,81 @@ random(Multiple Choice Examples)
                 subjectSelect.blur();
                 resetGame();
             };
-            function downloadJson() {
+            async function downloadJson() {
                 const p = parseNotepad(notepad.value);
+                if (p.errors && p.errors.length) {
+                    alert('Please fix the following typed-blanks formatting issue(s):\n\n' + p.errors.join('\n'));
+                    return;
+                }
                 const d = { tests: p.tests, names: p.testNames, modes: p.testModes, removed: p.testRemoved, mc: p.testMultipleChoice };
+                const imageIds = getImageIdsFromData(d);
+                const imageAssets = [];
+                for (const id of imageIds) {
+                    let record = imageLibraryCache.get(id);
+                    if (!record) {
+                        try {
+                            const records = await getAllStoredImages();
+                            records.forEach(item => imageLibraryCache.set(item.id, item));
+                            record = imageLibraryCache.get(id);
+                        } catch {}
+                    }
+                    if (!record) {
+                        alert(`The image ${id} is referenced by your questions but is missing from this browser's image library. Re-upload it before exporting.`);
+                        return;
+                    }
+                    imageAssets.push({
+                        id: record.id, name: record.name, alt: record.alt,
+                        mimeType: record.mimeType, dataUrl: record.dataUrl,
+                        sizeBytes: record.sizeBytes, originalSizeBytes: record.originalSizeBytes,
+                        createdAt: record.createdAt
+                    });
+                }
+                const exportData = { ...d, __baospaceImageAssets: imageAssets };
                 const label = (subjectSelect.selectedOptions[0] && subjectSelect.selectedOptions[0].text) || 'quiz';
                 const base = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'quiz';
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' }));
-                a.download = base + '.json'; a.click(); URL.revokeObjectURL(a.href);
+                const blob = new Blob([JSON.stringify(exportData)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = base + '.json';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
                 saveNotification.classList.remove('hidden');
                 setTimeout(() => saveNotification.classList.add('hidden'), 3000);
             }
+
             function importFile(input) {
-                const f = input.files[0]; if (!f) return;
-                const rd = new FileReader();
-                rd.onload = () => {
-                    if (/\.json$/i.test(f.name)) {
-                        try { applyData(JSON.parse(rd.result)); } catch { alert('Invalid JSON file'); return; }
-                    } else { notepad.value = rd.result; }
-                    updateLivePreview();
+                const file = input.files && input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    try {
+                        if (/\.json$/i.test(file.name)) {
+                            const imported = JSON.parse(reader.result);
+                            const clean = await restoreImageBundle(imported);
+                            applyData(clean);
+                        } else {
+                            notepad.value = reader.result;
+                        }
+                        updateLivePreview();
+                        autoSaveNotepad();
+                    } catch (error) {
+                        alert(`Could not import this file. ${error && error.message ? error.message : 'Check that it is a valid BAOspace JSON or text file.'}`);
+                    } finally {
+                        input.value = '';
+                    }
+                };
+                reader.onerror = () => {
+                    alert('Could not read the selected file.');
                     input.value = '';
                 };
-                rd.readAsText(f);
+                reader.readAsText(file);
             }
             function resetSubject() {
                 localStorage.removeItem(editKey(currentSubject));
+                try { localStorage.removeItem(editorDraftKey()); } catch {}
                 location.reload();
             }
 
@@ -2080,7 +3607,7 @@ random(Multiple Choice Examples)
 
                     if (e.key === 'Enter') {
                         const q = currentTest && currentTest.questions[currentTest.currentIndex];
-                        if (awaitingTypoContinue || (q && q.isTyped)) { e.preventDefault(); forceCheckAnswer(); }
+                        if (awaitingTypoContinue || (q && (q.isTyped || q.isBlankSet))) { e.preventDefault(); forceCheckAnswer(); }
                         return;
                     }
                     const idx = 'abcd'.indexOf(e.key.toLowerCase());
@@ -2093,8 +3620,11 @@ random(Multiple Choice Examples)
                 document.addEventListener('click', e => {
                     if (gameDiv.classList.contains('hidden') || maticMode) return;
                     const q = currentTest && currentTest.questions[currentTest.currentIndex];
-                    if (q && q.isTyped && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
-                        setTimeout(() => answerInput.focus(), 50);
+                    if (q && (q.isTyped || q.isBlankSet) && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
+                        setTimeout(() => {
+                            const nextInput = q.isBlankSet ? blankAnswersContainer.querySelector('input') : answerInput;
+                            if (nextInput) nextInput.focus();
+                        }, 50);
                     }
                 });
 
@@ -2103,6 +3633,25 @@ random(Multiple Choice Examples)
                     if (!maticMode) { alert('Please enable MATIC mode first!'); return; }
                     toggleTTS();
                 };
+                document.addEventListener('click', e => {
+                    const image = e.target && e.target.closest ? e.target.closest('img.baospace-inline-image') : null;
+                    if (image && !image.classList.contains('image-load-failed')) {
+                        // Capture the click before an enclosing multiple-choice option can submit.
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openImageLightbox(image.currentSrc || image.src, image.alt || 'Question image');
+                    }
+                }, true);
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'Escape') {
+                        closeImageLightbox();
+                        return;
+                    }
+                    if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('img.baospace-inline-image')) {
+                        e.preventDefault();
+                        openImageLightbox(e.target.currentSrc || e.target.src, e.target.alt || 'Question image');
+                    }
+                });
             }
 
             // ============================================================
@@ -2141,7 +3690,14 @@ random(Multiple Choice Examples)
             window.hideReview = hideReview;
             window.autoSaveNotepad = autoSaveNotepad;
             window.updateLivePreview = updateLivePreview;
+            window.updateAutocomplete = updateAutocomplete;
+            window.handleAutocompleteKeydown = handleAutocompleteKeydown;
             window.forceCheckAnswer = forceCheckAnswer;
+            window.openImageUpload = openImageUpload;
+            window.handleImageUpload = handleImageUpload;
+            window.openImageLibrary = openImageLibrary;
+            window.closeImageLibrary = closeImageLibrary;
+            window.closeImageLightbox = closeImageLightbox;
 
             // Navigation helpers for the redesigned sidebar.
             window.openQuizView = () => {
